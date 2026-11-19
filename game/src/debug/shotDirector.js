@@ -124,6 +124,13 @@ export async function stageShot(game, name, title) {
     return u;
   });
   police.helicopter.spawn(true);
+  // Oncoming traffic and a crowd scattering on the promenade.
+  game.traffic.spawnOnLane(114, 115, 0, 0.35, 'sedan');
+  game.traffic.spawnOnLane(113, 114, 1, 0.7, 'van');
+  for (let k = 0; k < 10; k++) {
+    const h = game.peds.add(-8 + k * 3.1, 409.5 + (k % 3) * 1.6, null, 0);
+    h.y = 0.18; h.ped.state = 'flee'; h.ped.fear = 9; h.ped.fromX = 30; h.ped.fromZ = 398;
+  }
   Object.assign(police.helicopter, { x: 8, z: 388, y: 34, aimX: 30, aimZ: 398 });
   game.input.simulate('KeyW', true);
   let exploded = false;
@@ -142,8 +149,8 @@ export async function stageShot(game, name, title) {
   Object.assign(heli, { x: car.x - 4, z: car.z + 5, y: 13, aimX: car.x + 1, aimZ: car.z, heading: Math.PI / 2 + 0.5 });
   heli.update(0, true);
   game.cameraRig.override = (cam) => {
-    cam.position.set(car.x + 24, car.y + 7, car.z + 9.5);
-    cam.lookAt(car.x - 9, car.y + 3.6, car.z - 1.5);
+    cam.position.set(car.x + 19, car.y + 5.6, car.z + 7.5);
+    cam.lookAt(car.x - 10, car.y + 3.4, car.z - 1.5);
   };
   for (let i = 0; i < 3; i++) { game.frame(STEP); await frames(); }
 }
