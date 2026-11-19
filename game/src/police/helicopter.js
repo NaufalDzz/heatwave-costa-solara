@@ -134,7 +134,7 @@ export function createHelicopter(game) {
       parts.root.rotation.set(heli.falling ? 0.3 : 0.12, heli.heading, heli.falling ? 0.4 : Math.sin(game.time * 0.8) * 0.05);
       const lit = !heli.falling;
       const night = Math.max(0.35, game.sky.nightFactor);
-      spot.intensity = lit ? 2500 * night : 0;
+      spot.intensity = lit ? 1100 * night : 0;
       spot.position.set(heli.x, heli.y - 1.6, heli.z);
       spot.target.position.set(heli.aimX, 0, heli.aimZ);
       beam.visible = pool.visible = lit;
@@ -146,7 +146,7 @@ export function createHelicopter(game) {
         beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), look.normalize());
         beamMat.opacity = 0.06 + night * 0.12;
         pool.position.set(heli.aimX, 0.12, heli.aimZ);
-        pool.material.opacity = 0.1 + night * 0.3;
+        pool.material.opacity = 0.06 + night * 0.18;
       }
     },
   };

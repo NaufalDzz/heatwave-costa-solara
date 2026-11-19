@@ -63,6 +63,7 @@ export function buildWaterfront(scene, sky) {
   const walls = new GeometryBuilder();
   walls.box(COAST - 13, -3, -760, COAST, 0.15, COAST, '#d9d2c3', { su: 4, sv: 4 });
   walls.box(COAST - 0.6, 0.15, -760, COAST, 1.1, COAST, '#f4f1ea');
+  walls.box(-760, -0.1, 407, COAST - 13, 0.18, 421, '#efe6d6', { su: 4, sv: 4 });
   group.add(mesh(walls.build(), std({ map: surfaceTexture('sidewalk') })));
 
   // Boardwalk along the beach.

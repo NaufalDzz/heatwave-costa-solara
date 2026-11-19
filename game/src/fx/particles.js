@@ -12,11 +12,11 @@ void main(){ float a = texture2D(map, gl_PointCoord).a * vTint.a; if (a < 0.01) 
 }`;
 
 const PRESETS = {
-  fire: { add: true, life: [0.4, 0.9], size: [2.2, 0.6], color: ['#ffd27a', '#ff4a1a'], alpha: [1, 0], vel: [2, 3.5, 2], gravity: -2, drag: 1.5 },
+  fire: { add: true, life: [0.4, 0.9], size: [2.2, 0.6], color: ['#ffc15a', '#ff3a10'], alpha: [0.8, 0], vel: [2, 3.5, 2], gravity: -2, drag: 1.5 },
   flame: { add: true, life: [0.25, 0.55], size: [1.4, 0.4], color: ['#ffe08a', '#ff5a1a'], alpha: [1, 0], vel: [0.6, 2.5, 0.6], gravity: -3, drag: 1 },
   spark: { add: true, life: [0.2, 0.5], size: [0.35, 0.1], color: ['#fff2b0', '#ff9a30'], alpha: [1, 0], vel: [7, 6, 7], gravity: 14, drag: 0.5 },
   flash: { add: true, life: [0.05, 0.08], size: [1.6, 2.2], color: ['#fff6c8', '#ffb040'], alpha: [1, 0], vel: [0, 0, 0], gravity: 0, drag: 0 },
-  blast: { add: true, life: [0.5, 0.9], size: [7, 12], color: ['#fff0b0', '#ff3d00'], alpha: [1, 0], vel: [9, 7, 9], gravity: -1, drag: 3 },
+  blast: { add: true, life: [0.5, 0.9], size: [5, 9], color: ['#ffb84d', '#ff2a00'], alpha: [0.55, 0], vel: [9, 7, 9], gravity: -1, drag: 3 },
   smoke: { add: false, life: [1.6, 2.8], size: [1.6, 5.5], color: ['#4a4a4a', '#8a8580'], alpha: [0.55, 0], vel: [1, 2.2, 1], gravity: -1.2, drag: 0.8 },
   blacksmoke: { add: false, life: [2.5, 4], size: [3, 10], color: ['#1d1b1a', '#5a5550'], alpha: [0.75, 0], vel: [2, 3.5, 2], gravity: -1.5, drag: 0.7 },
   dust: { add: false, life: [0.6, 1.2], size: [0.8, 2.6], color: ['#cfc3a8', '#e8dcc0'], alpha: [0.45, 0], vel: [1.5, 1, 1.5], gravity: -0.5, drag: 2 },

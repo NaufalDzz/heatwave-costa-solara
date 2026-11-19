@@ -1,5 +1,6 @@
 [
-  { "name": "1-start.jpg", "query": "?shot=start&seed=1" },
-  { "name": "2-play.jpg", "query": "?shot=play&seed=1" },
-  { "name": "3-end.jpg", "query": "?shot=end&seed=1" }
+  { "name": "1-sunset-chase.jpg", "query": "?shot=chase&seed=1", "caption": "Five-star escape on the Palmera Beach boulevard at sunset: SCPD cruisers ramming, Air-1 helicopter spotlight, a cruiser exploding, story job 10/10, dispatch board, radar, speedometer, radio and dialogue." },
+  { "name": "2-neon-shootout.jpg", "query": "?shot=shootout&seed=1", "caption": "On-foot SMG shootout with Coyote gang collectors in Neon Row: pedestrians fleeing, traffic, a burning car, two stars with a cruiser arriving, weapon slots and the mission objective." },
+  { "name": "3-pause-map.jpg", "query": "?shot=pause&seed=1", "caption": "Pause menu: full city map with GPS route, waypoint and legend, current job, career stats and save slots." },
+  { "name": "4-title.jpg", "query": "?shot=title&seed=1", "caption": "Title screen over a live flyover of Costa Solara with Continue showing the autosave summary." }
 ]

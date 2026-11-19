@@ -6,7 +6,7 @@ import { DISTRICTS, ISLAND, COAST, BEACH_END, BRIDGES } from '../world/cityLayou
 export const MAP = { x0: -760, z0: -760, size: 1500, px: 1500 };
 export const toMap = (x, z) => [((x - MAP.x0) / MAP.size) * MAP.px, ((z - MAP.z0) / MAP.size) * MAP.px];
 
-export function renderCityMap(layout) {
+export function renderCityMap(layout, { labels = true } = {}) {
   const c = document.createElement('canvas');
   c.width = c.height = MAP.px;
   const g = c.getContext('2d');
@@ -30,8 +30,8 @@ export function renderCityMap(layout) {
   g.lineCap = 'square';
   for (const r of layout.roads) {
     const [a, b] = toMap(r.x0, r.z0), [c2, d] = toMap(r.x1, r.z1);
-    g.strokeStyle = r.bridge ? '#e8e2d0' : r.main ? '#f2d27a' : '#aab3c4';
-    g.lineWidth = 14 * k;
+    g.strokeStyle = r.bridge ? '#f4efe2' : r.main ? '#dfe5ee' : '#a3acbd';
+    g.lineWidth = (r.main ? 18 : 14) * k;
     g.beginPath(); g.moveTo(a, b); g.lineTo(c2, d); g.stroke();
   }
   for (const r of [[-700, -240, -407, -240], [-700, 0, -407, 0], [-700, 240, -407, 240], [-160, -700, -160, -407], [160, -700, 160, -407]]) {
@@ -40,11 +40,12 @@ export function renderCityMap(layout) {
     g.beginPath(); g.moveTo(a, b); g.lineTo(c2, d); g.stroke();
   }
   for (const br of BRIDGES) { g.fillStyle = '#f5efe0'; rect(br.x0, br.z - 8, br.x1, br.z + 8); }
+  if (!labels) return c;
   // District names.
   g.font = 'italic 900 30px Arial Black, Arial, sans-serif';
   g.textAlign = 'center';
-  const labels = [['downtown', 40, -120], ['neon', 240, 80], ['palmera', -120, 470], ['heights', -280, -120], ['ironworks', 220, -300], ['midtown', -40, -330], ['marina', 600, 0], ['hills', -560, -560]];
-  for (const [id, x, z] of labels) {
+  const spots = [['downtown', 40, -120], ['neon', 240, 80], ['palmera', -120, 470], ['heights', -280, -120], ['ironworks', 220, -300], ['midtown', -40, -330], ['marina', 600, 0], ['hills', -560, -560]];
+  for (const [id, x, z] of spots) {
     const [a, b] = toMap(x, z);
     g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillText(DISTRICTS[id].name.toUpperCase(), a + 2, b + 2);
     g.fillStyle = DISTRICTS[id].color; g.fillText(DISTRICTS[id].name.toUpperCase(), a, b);

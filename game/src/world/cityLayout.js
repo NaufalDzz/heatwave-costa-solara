@@ -22,7 +22,7 @@ export const DISTRICTS = {
 };
 
 const PALETTES = {
-  glass: ['#8fb8d8', '#a7c7e0', '#7aa3c4', '#b9d4e6', '#9cc3c9'],
+  glass: ['#bfe3ff', '#d4ecff', '#a9d8f0', '#c8f0f0', '#e0d4ff', '#ffd9c2'],
   stucco: ['#f2d4b6', '#f6e7cf', '#e8c3a5', '#f1d0c8', '#ead8b1'],
   deco: ['#ffd1dc', '#b8f0e6', '#fff1b8', '#ffc9a8', '#cfe8ff', '#f8c8f0'],
   brick: ['#b9715a', '#9a5a4a', '#c98e6b', '#7f5a6e', '#a6706a'],

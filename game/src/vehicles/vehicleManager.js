@@ -247,7 +247,7 @@ export function createVehicleManager(game) {
           if (!s.visible) continue;
           s.getWorldPosition(tmp);
           const c = k ? blue : red;
-          gPos.setXYZ(n, tmp.x, tmp.y + 0.1, tmp.z); gCol.setXYZ(n, c.r, c.g, c.b); gSize.setX(n, 9); n++;
+          gPos.setXYZ(n, tmp.x, tmp.y + 0.1, tmp.z); gCol.setXYZ(n, c.r, c.g, c.b); gSize.setX(n, 13); n++;
         }
       }
     }

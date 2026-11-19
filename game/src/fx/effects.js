@@ -51,10 +51,10 @@ export function createEffects(scene, particles, rng) {
       f.t = 0; f.peak = intensity;
     },
     explosion(x, y, z, power = 1) {
-      particles.emit('blast', x, y + 1, z, Math.round(26 * power), { jitter: 2, scale: power });
+      particles.emit('blast', x, y + 1, z, Math.round(14 * power), { jitter: 2, scale: power });
       particles.emit('fire', x, y + 1, z, Math.round(30 * power), { jitter: 2.5, spread: 1.6 });
       particles.emit('spark', x, y + 1, z, Math.round(40 * power), { spread: 2 });
-      particles.emit('blacksmoke', x, y + 2, z, Math.round(22 * power), { jitter: 3 });
+      particles.emit('blacksmoke', x, y + 2, z, Math.round(30 * power), { jitter: 3, spread: 1.4 });
       fx.flash(x, y + 3, z, 260 * power);
       fx.shake = Math.min(1.5, fx.shake + power);
       const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: '#ffd59a', transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));

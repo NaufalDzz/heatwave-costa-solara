@@ -31,8 +31,8 @@ export function createMissionRunner(game) {
   function begin(mission, skipIntro = false) {
     st.active = mission; st.stage = -1;
     st.startMarker?.remove(); st.startMarker = null;
-    game.hud.big(mission.title.toUpperCase(), `${CAST[mission.giver].name} · Job ${st.index + 1} of ${STORY.length}`, 'passed', 3);
     if (skipIntro) return nextStage();
+    game.hud.big(mission.title.toUpperCase(), `${CAST[mission.giver].name} · Job ${st.index + 1} of ${STORY.length}`, 'passed', 3);
     game.player.controlsLocked = true;
     game.dialogue.play(mission.intro).then(() => { if (st.active === mission) { game.player.controlsLocked = false; nextStage(); } });
   }

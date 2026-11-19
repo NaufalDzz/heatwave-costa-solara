@@ -30,7 +30,7 @@ export function createPauseMenu(game) {
     const m = game.missions.active || STORY[game.missions.index];
     body.innerHTML = `<canvas class="pm-map" width="900" height="900"></canvas><div class="pm-col"><div class="pm-card"><h3>LEGEND</h3><div class="legend">${legend}<i style="background:#ffcf4a"></i><span>Story job</span><i style="background:#ff3030"></i><span>SCPD units</span><i style="background:#ff9f1c"></i><span>Stunt jump</span><i style="background:#d36bff"></i><span>Waypoint (click map)</span></div></div>
       <div class="pm-card"><h3>CURRENT JOB</h3>${m ? `<b>${m.title}</b><br><span style="color:#ccc">${m.blurb}</span>` : 'Story complete'}</div>
-      <div class="pm-card"><h3>WANTED</h3>${'★'.repeat(game.wanted.level)}${'☆'.repeat(5 - game.wanted.level)} ${game.wanted.searching ? '· search zone on map' : ''}</div></div>`;
+      <div class="pm-card"><h3>CAREER</h3>${careerRows()}</div>${lastSave()}</div>`;
     const c = body.querySelector('canvas');
     drawMap(c);
     c.addEventListener('click', (e) => {
@@ -43,6 +43,16 @@ export function createPauseMenu(game) {
     c.addEventListener('contextmenu', () => { game.waypoint = null; drawMap(c); });
   }
 
+  function careerRows() {
+    const s = game.economy.stats;
+    return [['Jobs passed', `${game.missions.done.length}/${STORY.length}`], ['Sun Tokens', `${s.tokens}/30`], ['Stunt jumps', `${s.stuntJumps}/5`], ['Races won', s.racesWon], ['Cars stolen', s.carsStolen], ['Highest wanted', '★'.repeat(s.maxWanted) || '-']]
+      .map(([k, v]) => `<div class="stat-row"><span>${k}</span><b>${v}</b></div>`).join('');
+  }
+  function lastSave() {
+    const d = game.save.latest(), sm = summarize(d);
+    return sm ? `<div class="pm-card"><h3>LAST SAVE · ${d.slot === 'auto' ? 'AUTOSAVE' : 'SLOT ' + d.slot}</h3>${sm.title}<br><span style="color:#aaa">${sm.money} · ${sm.time} · ${sm.pct}% complete</span></div>` : '';
+  }
+
   function drawMap(c) {
     const g = c.getContext('2d');
     const s = c.width / MAP.px;
@@ -52,9 +62,9 @@ export function createPauseMenu(game) {
     const target = game.missions.gpsTarget() || game.waypoint;
     if (target) {
       const route = routeBetween(game.layout.nodes, p.x, p.z, target.x, target.z);
-      g.strokeStyle = '#ffcf4a'; g.lineWidth = 5; g.lineJoin = 'round'; g.beginPath();
+      g.strokeStyle = '#ffcf4a'; g.lineWidth = 7; g.lineJoin = 'round'; g.shadowColor = '#ff9f1c'; g.shadowBlur = 10; g.beginPath();
       route.forEach(([x, z], i) => { const [a, b] = P(x, z); i ? g.lineTo(a, b) : g.moveTo(a, b); });
-      g.stroke();
+      g.stroke(); g.shadowBlur = 0;
     }
     const zone = game.wanted.searchZone;
     if (zone && game.wanted.level) { const [a, b] = P(zone.x, zone.z); g.beginPath(); g.arc(a, b, zone.r * s * (MAP.px / MAP.size), 0, Math.PI * 2); g.fillStyle = 'rgba(255,50,50,0.25)'; g.fill(); g.strokeStyle = '#ff4040'; g.lineWidth = 2; g.stroke(); }
