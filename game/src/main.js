@@ -2,6 +2,8 @@
 // screenshot scene (?shot=name), drops straight into play (?autostart=1) or shows the title
 // screen over a live flyover of the city. The simulation runs in fixed 1/60 s steps.
 import { createGame } from './core/game.js';
+import { createTitleScreen } from './ui/titleScreen.js';
+import { stageShot } from './debug/shotDirector.js';
 
 const params = new URLSearchParams(location.search);
 const STEP = 1 / 60;
@@ -20,13 +22,44 @@ function boot() {
     game.hud.show(true);
     if (!game.traffic.cars.size) { game.traffic.populate(); game.peds.populate(); }
   };
-  game.startPlay();
+  const newGame = () => {
+    game.sky.setHour(17.4);
+    game.startPlay();
+    game.hud.big('COSTA SOLARA', 'Five years gone. The city kept the lights on.', 'passed', 4);
+    game.dialogue.play([['rosa', 'Nico? It is Rosa. Welcome home, mijo. Come see me at Café Rosa in Sunset Heights.'], ['rosa', 'Follow the yellow route on your radar. And try not to steal anything on the way.']]);
+  };
+  const title = createTitleScreen(game, {
+    onNewGame: newGame,
+    onContinue: (save) => { game.save.load(save); game.startPlay(); game.hud.notify('Welcome back to Costa Solara'); },
+  });
+
+  const shot = params.get('shot');
+  if (shot) {
+    stageShot(game, shot, title).then(() => { window.__shotReady = true; });
+    return;
+  }
+
+  addEventListener('keydown', (e) => {
+    game.audio.unlock();
+    if (e.code !== 'Escape' && e.code !== 'KeyP') return;
+    if (game.shop.open) game.shop.close();
+    else if (game.pauseMenu.open) game.pauseMenu.close();
+    else if (game.mode === 'play') game.pauseMenu.show(0);
+  });
+  addEventListener('mousedown', () => game.audio.unlock());
+
+  if (params.get('autostart') === '1') newGame();
+  else {
+    game.traffic.populate(); game.peds.populate();
+    game.sky.setHour(18.6);
+    title.show();
+  }
 
   let last = performance.now(), acc = 0;
   function loop(now) {
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
-    if (game.mode !== 'paused') {
+    if (game.mode !== 'paused' && game.mode !== 'shop') {
       acc += dt;
       let steps = 0;
       while (acc >= STEP && steps < 4) { game.update(STEP); acc -= STEP; steps++; }

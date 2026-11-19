@@ -24,6 +24,14 @@ import { createPedestrians } from '../ai/pedestrians.js';
 import { createHud } from '../ui/hud.js';
 import { createMinimap } from '../ui/minimap.js';
 import { renderCityMap } from '../ui/mapRenderer.js';
+import { createDialogue } from '../ui/dialogue.js';
+import { createMissionRunner } from '../missions/missionRunner.js';
+import { createActivities } from '../missions/sideActivities.js';
+import { createSoundEffects } from '../audio/soundEffects.js';
+import { createRadio } from '../audio/radio.js';
+import { createSaveSystem } from '../save/saveSystem.js';
+import { createPauseMenu } from '../ui/pauseMenu.js';
+import { createShopMenu } from '../ui/shopMenu.js';
 
 export function createGame(canvas, seed = 1) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -66,6 +74,15 @@ export function createGame(canvas, seed = 1) {
   game.minimap = createMinimap(game, document.getElementById('minimap'), game.mapImage);
   game.waypoint = null;
   game.extraHumanoids = [];
+  game.audio = createSoundEffects(game);
+  game.radio = createRadio(game);
+  game.dialogue = createDialogue(game);
+  game.activities = createActivities(game);
+  game.missions = createMissionRunner(game);
+  game.save = createSaveSystem(game);
+  game.pauseMenu = createPauseMenu(game);
+  game.shop = createShopMenu(game);
+  game.extraBlips = () => [...game.activities.blips(), ...game.missions.blips()];
 
   let humanoidCache = [];
   game.humanoids = () => humanoidCache;
@@ -117,8 +134,10 @@ export function createGame(canvas, seed = 1) {
       game.traffic.update(dt);
       game.peds.update(dt);
       game.police.update(dt);
-      game.missions?.update(dt);
-      game.activities?.update(dt);
+      game.missions.update(dt);
+      game.activities.update(dt);
+      game.shop.update(dt);
+      game.radio.update(dt);
       game.wanted.update(dt);
       game.economy.stats.playSeconds += dt;
       if (game.player.vehicle) game.economy.stats.distanceKm += Math.abs(game.player.vehicle.speed) * dt / 1000;
@@ -152,10 +171,22 @@ export function createGame(canvas, seed = 1) {
     for (const m of city.signMaterials) m.color.setScalar(0.45 + nf * 0.75);
     game.props.glows.material.uniforms.intensity.value = 0.08 + nf * 1.1;
     beacons.material.uniforms.intensity.value = Math.sin(game.realTime * 3) > 0 ? 0.6 + nf : 0.1;
-    if (game.mode === 'play' || game.mode === 'shot') { game.hud.update(dt); game.minimap.update(dt); }
+    if (game.mode === 'play' || game.mode === 'shot') { game.hud.update(dt); game.minimap.update(dt); contextHelp(); }
+    game.audio.update();
     glowScale.value = renderer.domElement.height / 2 / Math.tan((camera.fov * Math.PI) / 360);
     renderer.render(scene, camera);
   };
+
+  function contextHelp() {
+    const p = game.player;
+    let help = '';
+    if (game.respawning || p.controlsLocked) help = game.dialogue.active ? 'Press <kbd>ENTER</kbd> to skip' : '';
+    else if (!p.vehicle) {
+      const v = game.vehicles.nearest(p.hero.x, p.hero.z, 3.2, (c) => !c.exploded && c.driver !== 'cop');
+      if (v) help = `Press <kbd>F</kbd> to ${v.driver === 'npc' ? 'steal' : 'enter'} the ${v.spec.name}`;
+    } else if (p.vehicle.type === 'taxi' && !game.activities.active && !game.missions.active) help = 'Press <kbd>T</kbd> for taxi fares · <kbd>Q</kbd> radio';
+    game.hud.help(help);
+  }
 
   game.resize = () => {
     const w = innerWidth, h = innerHeight;
