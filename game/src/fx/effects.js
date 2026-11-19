@@ -76,7 +76,8 @@ export function createEffects(scene, particles, rng) {
       for (let i = 1; i < n; i++) { const f = i / n; particles.emit('streak', ax + (bx - ax) * f, ay + (by - ay) * f, az + (bz - az) * f, 1, { jitter: 0 }); }
     },
     muzzle(x, y, z) {
-      particles.emit('flash', x, y, z, 3, { jitter: 0.15, scale: 1.4 });
+      particles.emit('flash', x, y, z, 2, { jitter: 0.08, scale: 0.55 });
+      particles.emit('spark', x, y, z, 3, { spread: 0.35 });
       fx.flash(x, y, z, 30, '#ffcf70');
     },
     impact(x, y, z, kind) {

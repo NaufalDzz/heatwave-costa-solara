@@ -56,7 +56,8 @@ export async function stageShot(game, name, title) {
     return;
   }
   if (name === 'shootout') {
-    // Neon Row's north-south strip, where the club signs face the street.
+    // Neon Row's north-south strip, where the club signs face the street: an over-the-shoulder
+    // view of Nico trading SMG fire with three Coyote collectors, traffic and a fleeing crowd.
     progress(game, 2);
     game.sky.setHour(19.55);
     player.teleport(319, 40, 0);
@@ -65,46 +66,55 @@ export async function stageShot(game, name, title) {
     game.weapons.select(2);
     clearAround(game, 320, 50, 45);
     const goons = game.missions.context().enemies;
-    [[315, 57], [324.5, 59.5], [319.5, 66]].forEach(([x, z], i) => { goons[i].x = x; goons[i].z = z; goons[i].heading = Math.PI; });
-    const wreck = vehicles.spawn('sedan', 326, 67, 0.4, { parked: true, color: '#457b9d' });
+    const spots = [[315.2, 47], [325.2, 48.5], [320.6, 53]];
+    const pin = () => goons.forEach((g, i) => { g.x = spots[i][0]; g.z = spots[i][1]; g.alerted = true; });
+    pin();
+    const wreck = vehicles.spawn('sedan', 326.2, 60, 0.4, { parked: true, color: '#457b9d' });
     wreck.condition = 0; wreck.burnTimer = -100;
-    game.traffic.spawnOnLane(64, 75, 1, 0.55, 'taxi');
-    game.traffic.spawnOnLane(75, 64, 1, 0.75, 'suv');
-    for (let k = 0; k < 12; k++) {
-      const side = k % 2 ? 311 : 329;
-      const h = game.peds.add(side + (k % 3) * 0.7, 30 + k * 3.4, null, 0);
+    for (let k = 0; k < 14; k++) {
+      const side = k % 2 ? 311.2 : 328.8;
+      const h = game.peds.add(side + (k % 3) * 0.6, 36 + k * 2.4, null, 0);
       h.y = 0.18;
     }
     game.wanted.setLevel(2);
     const unit = police.spawnUnitNear(321.9, 6, 0);
     unit.vehicle.vz = 13;
+    const shoulder = (cam) => {
+      const h = player.hero;
+      cam.position.set(h.x - 1.9, h.y + 2.9, h.z - 5.2);
+      cam.lookAt(h.x + 0.9, h.y + 1.2, h.z + 12);
+    };
+    game.cameraRig.override = shoulder;
     game.input.simulate('KeyE', true);
+    const shoot = (from, to, opts) => {
+      const o = { x: from.x + 0.4, y: from.y + 1.45, z: from.z + 0.6 };
+      const d = { x: to.x - o.x, y: to.y + 1.2 - o.y, z: to.z - o.z }, l = Math.hypot(d.x, d.y, d.z);
+      game.weapons.fire(from, o, { x: d.x / l, y: d.y / l, z: d.z / l }, { id: 'smg', damage: 1, range: 110, spread: 0.02 }, { muzzle: [o.x, o.y, o.z], ...opts });
+    };
     simulate(game, 2.0, (t) => {
       game.cameraRig.yaw = 0.02; game.cameraRig.pitch = 0.1;
-      for (const g of goons) g.alerted = true;
-      if (Math.round(t * 60) % 8 === 0 && t > 0.5) {
-        const tgt = goons[Math.floor(t * 3) % goons.length];
-        const o = { x: player.hero.x + 0.4, y: player.hero.y + 1.45, z: player.hero.z + 0.6 };
-        const d = { x: tgt.x - o.x, y: tgt.y + 1.3 - o.y, z: tgt.z - o.z };
-        const l = Math.hypot(d.x, d.y, d.z);
-        game.weapons.fire(player.hero, o, { x: d.x / l, y: d.y / l, z: d.z / l }, { id: 'smg', damage: 12, range: 110, spread: 0.02 }, { byPlayer: true, muzzle: [o.x, o.y, o.z] });
-      }
-      for (const h of game.peds.list) if (Math.hypot(h.x - 320, h.z - 55) < 40) { h.ped.state = 'flee'; h.ped.fear = 8; h.ped.fromX = 320; h.ped.fromZ = 70; }
+      pin();
+      if (Math.round(t * 60) % 8 === 0 && t > 0.5) shoot(player.hero, goons[Math.floor(t * 3) % goons.length], { byPlayer: true });
+      for (const h of game.peds.list) if (Math.hypot(h.x - 320, h.z - 50) < 40) { h.ped.state = 'flee'; h.ped.fear = 8; h.ped.fromX = 320; h.ped.fromZ = 52; }
       player.hero.x = 319; player.hero.z = 40; player.hero.health = 100;
     });
-    // A last burst so tracers and muzzle flashes are in the frame.
-    const volley = (tgt) => {
-      const o = { x: player.hero.x + 0.4, y: player.hero.y + 1.45, z: player.hero.z + 0.6 };
-      const d = { x: tgt.x - o.x, y: tgt.y + 1.2 - o.y, z: tgt.z - o.z }, l = Math.hypot(d.x, d.y, d.z);
-      game.weapons.fire(player.hero, o, { x: d.x / l, y: d.y / l, z: d.z / l }, { id: 'smg', damage: 1, range: 110, spread: 0.01 }, { byPlayer: true, muzzle: [o.x, o.y, o.z] });
-    };
-    volley(goons[1]); game.update(STEP); game.update(STEP); volley(goons[0]); game.update(STEP);
-    game.dialogue.hold('lexi', 'Coyotes, three of them outside Club Azure. Light them up, Nico. I have your back.');
-    game.cameraRig.override = (cam) => {
-      const h = player.hero;
-      cam.position.set(h.x - 2.8, h.y + 3.9, h.z - 7.2);
-      cam.lookAt(h.x + 1.4, h.y + 1.7, h.z + 20);
-    };
+    // Traffic rolls in on both lanes once the street is set (spawned late so it is still in view).
+    const taxi = game.traffic.spawnOnLane(64, 75, 1, 0.62, 'taxi');
+    game.traffic.spawnOnLane(75, 64, 1, 0.55, 'suv');
+    game.traffic.spawnOnLane(64, 75, 0, 0.8, 'sports');
+    simulate(game, 0.25, () => { pin(); player.hero.x = 319; player.hero.z = 40; });
+    // Their rounds kick up the asphalt beside him (aimed at the road so no tracer runs past the camera).
+    const nearMiss = { x: player.hero.x + 1.8, y: -1.1, z: player.hero.z + 2.2 };
+    // A last exchange so muzzle flashes and tracers from both sides are in the frame.
+    shoot(player.hero, goons[1], { byPlayer: true });
+    shoot(goons[0], nearMiss, { friendly: true, damageScale: 0 });
+    game.update(STEP);
+    shoot(goons[2], nearMiss, { friendly: true, damageScale: 0 });
+    shoot(player.hero, goons[0], { byPlayer: true });
+    shoot(goons[1], nearMiss, { friendly: true, damageScale: 0 });
+    game.update(STEP);
+    player.hero.health = 100;
+    game.dialogue.clear();
     for (let i = 0; i < 3; i++) { game.frame(STEP); await frames(); }
     return;
   }
