@@ -25,6 +25,7 @@ import { createCameraRig } from '../player/cameraRig.js';
 import { createWeapons } from '../combat/weapons.js';
 import { createVehicleManager } from '../vehicles/vehicleManager.js';
 import { createParticles } from '../fx/particles.js';
+import { createBloomPass } from '../fx/bloomPass.js';
 import { createEffects } from '../fx/effects.js';
 import { createGlowPoints, glowScale } from '../fx/glowSprites.js';
 import { createCityLayout } from '../world/cityLayout.js';
@@ -40,11 +41,12 @@ export function createGame(canvas, seed = 1) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  const bloom = createBloomPass(renderer);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(62, 1, 0.3, 2400);
   camera.position.set(0, 40, 80);
 
-  const game = { scene, camera, renderer, time: 0, realTime: 0, day: 3, mode: 'loading', settings: { sensitivity: 1, invertY: false, volume: 0.8, music: 0.6 } };
+  const game = { scene, camera, renderer, bloom, time: 0, realTime: 0, day: 3, mode: 'loading', settings: { sensitivity: 1, invertY: false, volume: 0.8, music: 0.6 } };
   game.rng = createRng(seed);
   game.events = createEvents();
   game.input = createInput(canvas);
@@ -175,7 +177,7 @@ export function createGame(canvas, seed = 1) {
     if (game.mode === 'play' || game.mode === 'shot') { game.hud.update(dt); game.minimap.update(dt); contextHelp(); }
     game.audio.update();
     glowScale.value = renderer.domElement.height / 2 / Math.tan((camera.fov * Math.PI) / 360);
-    renderer.render(scene, camera);
+    bloom.render(scene, camera);
   };
 
   function contextHelp() {
@@ -192,6 +194,8 @@ export function createGame(canvas, seed = 1) {
   game.resize = () => {
     const w = innerWidth, h = innerHeight;
     renderer.setSize(w, h, false);
+    const size = renderer.getDrawingBufferSize(new THREE.Vector2());
+    bloom.setSize(size.x, size.y);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   };

@@ -7,7 +7,7 @@ import { routeBetween } from '../ai/roadGraph.js';
 export function createMinimap(game, canvas, mapImage) {
   const g = canvas.getContext('2d');
   const S = canvas.width, R = S / 2;
-  const scale = 0.62; // radar pixels per map pixel
+  const scale = 0.5; // radar pixels per map pixel
   let route = null, routeKey = '', routeAge = 0;
 
   return {
@@ -33,7 +33,7 @@ export function createMinimap(game, canvas, mapImage) {
       g.drawImage(mapImage, 0, 0);
       const k = MAP.px / MAP.size;
       if (route) {
-        g.strokeStyle = game.missions?.active ? '#ffcf4a' : '#d36bff'; g.lineWidth = 7 * k / scale * 0.9; g.lineJoin = 'round';
+        g.strokeStyle = game.missions?.gpsTarget() ? '#ffcf4a' : '#d36bff'; g.lineWidth = 7 * k / scale * 0.9; g.lineJoin = 'round';
         g.beginPath();
         route.forEach(([x, z], i) => { const [a, b] = toMap(x, z); i ? g.lineTo(a, b) : g.moveTo(a, b); });
         g.stroke();

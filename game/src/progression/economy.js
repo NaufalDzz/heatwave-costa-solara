@@ -65,5 +65,11 @@ export function createEconomy(game) {
     serialize() { return { money: eco.money, respect: eco.respect, upgrades: { ...eco.upgrades }, stats: { ...eco.stats } }; },
     restore(d) { eco.money = d.money; eco.respect = d.respect; Object.assign(eco.upgrades, d.upgrades); Object.assign(eco.stats, d.stats); },
   };
+  game.events.on('kill', (e) => {
+    if (!e.byPlayer || e.victim.kind === 'player') return;
+    const w = game.weapons, cur = w.current();
+    if (e.victim.kind === 'goon') { eco.addMoney(60 + Math.floor(game.rng.next() * 140), 'Loot'); eco.addRespect(12); }
+    if ((e.victim.kind === 'goon' || e.victim.kind === 'cop' || e.victim.kind === 'swat') && cur.clip) w.inv.ammo[cur.id] += Math.ceil(cur.clip / 2);
+  });
   return eco;
 }

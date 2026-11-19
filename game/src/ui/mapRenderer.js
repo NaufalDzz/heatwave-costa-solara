@@ -3,7 +3,7 @@
 // common blip icons onto either.
 import { DISTRICTS, ISLAND, COAST, BEACH_END, BRIDGES } from '../world/cityLayout.js';
 
-export const MAP = { x0: -760, z0: -760, size: 1500, px: 1500 };
+export const MAP = { x0: -620, z0: -560, size: 1340, px: 1340 };
 export const toMap = (x, z) => [((x - MAP.x0) / MAP.size) * MAP.px, ((z - MAP.z0) / MAP.size) * MAP.px];
 
 export function renderCityMap(layout, { labels = true } = {}) {
@@ -23,10 +23,12 @@ export function renderCityMap(layout, { labels = true } = {}) {
     g.fillStyle = b.kind === 'park' ? '#3f7d3a' : '#3c4352';
     rect(b.bx0, b.bz0, b.bx1, b.bz1);
     g.fillStyle = DISTRICTS[b.district].color;
-    g.globalAlpha = 0.3; rect(b.bx0, b.bz0, b.bx1, b.bz1); g.globalAlpha = 1;
+    g.globalAlpha = 0.42; rect(b.bx0, b.bz0, b.bx1, b.bz1); g.globalAlpha = 1;
   }
-  g.fillStyle = 'rgba(200,210,230,0.42)';
-  for (const b of layout.buildings) rect(b.x0, b.z0, b.x1, b.z1);
+  for (const b of layout.buildings) {
+    g.fillStyle = 'rgba(10,14,28,0.45)'; rect(b.x0 + 1.5, b.z0 + 1.5, b.x1 + 1.5, b.z1 + 1.5);
+    g.fillStyle = b.h > 60 ? 'rgba(225,235,255,0.75)' : 'rgba(205,215,235,0.5)'; rect(b.x0, b.z0, b.x1, b.z1);
+  }
   g.lineCap = 'square';
   for (const r of layout.roads) {
     const [a, b] = toMap(r.x0, r.z0), [c2, d] = toMap(r.x1, r.z1);

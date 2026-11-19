@@ -162,7 +162,7 @@ export function createCityLayout(seed = 1987) {
   rampList = ramps;
 
   const pois = {
-    safehouse: { x: -120, z: 391, name: 'Casa Sol Safehouse', icon: 'house', color: '#7CFC8A' },
+    safehouse: { x: -112, z: 391, name: 'Casa Sol Safehouse', icon: 'house', color: '#7CFC8A' },
     garage: { x: -280, z: 11, name: 'Wrench Works Garage', icon: 'wrench', color: '#4fc3f7' },
     gunshop: { x: 200, z: 91, name: 'Brass & Barrel Arms', icon: 'gun', color: '#ff7043' },
     hospital: { x: -40, z: -309, name: 'St. Maren Medical', icon: 'cross', color: '#ffffff' },

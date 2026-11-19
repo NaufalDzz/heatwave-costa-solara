@@ -279,7 +279,7 @@ export function createMissionRunner(game) {
     enemyBlips() { return ctx ? ctx.enemies.filter((h) => h.alive) : []; },
     blips() {
       const out = [];
-      if (st.startMarker) out.push({ x: STORY[st.index].start.x, z: STORY[st.index].start.z, color: '#ffcf4a', icon: CAST[STORY[st.index].giver].name[0], size: 10, always: true });
+      if (st.startMarker) out.push({ x: STORY[st.index].start.x, z: STORY[st.index].start.z, color: '#ffcf4a', icon: '★', size: 10, always: true });
       if (ctx?.target) out.push({ x: ctx.target.x, z: ctx.target.z, color: '#ffcf4a', icon: '!', size: 9, always: true });
       return out;
     },

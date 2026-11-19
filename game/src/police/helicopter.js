@@ -46,7 +46,7 @@ export function createHelicopter(game) {
   spot.castShadow = false;
   scene.add(spot, spot.target);
   const beamMat = new THREE.MeshBasicMaterial({ color: '#dff0ff', transparent: true, opacity: 0.14, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
-  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 7, 1, 20, 1, true), beamMat);
+  const beam = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 5.5, 1, 20, 1, true), beamMat);
   beam.geometry.translate(0, -0.5, 0);
   beam.visible = false;
   scene.add(beam);
@@ -144,7 +144,7 @@ export function createHelicopter(game) {
         beam.position.set(heli.x, heli.y - 1.6, heli.z);
         beam.scale.set(1, len, 1);
         beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), look.normalize());
-        beamMat.opacity = 0.06 + night * 0.12;
+        beamMat.opacity = 0.025 + night * 0.06;
         pool.position.set(heli.aimX, 0.12, heli.aimZ);
         pool.material.opacity = 0.06 + night * 0.18;
       }
