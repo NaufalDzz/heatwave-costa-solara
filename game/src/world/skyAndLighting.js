@@ -68,7 +68,7 @@ export function createSkyAndLighting(renderer, scene) {
   scene.add(sun, sun.target);
   const hemi = new THREE.HemisphereLight('#bcd8ff', '#8a7a5a', 1);
   scene.add(hemi);
-  scene.fog = new THREE.Fog('#c7def0', 160, 1300);
+  scene.fog = new THREE.Fog('#c7def0', 220, 1400);
 
   const envScene = new THREE.Scene();
   const envSky = new THREE.Mesh(sky.geometry, skyMat);

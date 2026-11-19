@@ -20,7 +20,7 @@ export function createShopMenu(game) {
     close() { kind = null; root.classList.add('hidden'); game.mode = 'play'; cooldown = 3; },
     update(dt) {
       cooldown = Math.max(0, cooldown - dt);
-      if (kind || cooldown > 0 || game.missions.active?.stages[game.missions.state.stage]?.type === 'deliver') return;
+      if (kind || cooldown > 0 || game.missions.active || game.activities.active || game.dialogue.active) return;
       const p = game.player.position;
       for (const [k, s] of Object.entries(shops)) {
         const d = Math.hypot(p.x - s.poi.x, p.z - s.poi.z);

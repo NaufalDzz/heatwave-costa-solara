@@ -27,7 +27,7 @@ export function buildCity(layout) {
   // --- Ground, roads and sidewalks ---------------------------------------------------------
   const ground = new GeometryBuilder();
   ground.flat(-760, -760, COAST, COAST, -0.02, '#9fae6c', 6);
-  ground.flat(ISLAND.x0, ISLAND.z0, ISLAND.x1, ISLAND.z1, -0.02, '#b8b48a', 6);
+  ground.flat(ISLAND.x0, ISLAND.z0, ISLAND.x1, ISLAND.z1, -0.02, '#c9dc98', 6);
   const grass = surfaceTexture('grass');
   group.add(mesh(ground.build(), std({ map: grass }), { cast: false }));
 
@@ -57,7 +57,9 @@ export function buildCity(layout) {
     else plazas.flat(b.ix0, b.iz0, b.ix1, b.iz1, 0.19, b.district === 'palmera' ? '#fff0e0' : '#ffffff', 4);
   }
   // Island promenade and sidewalks beside the island roads.
-  walks.box(ISLAND.x0 + 2, -0.1, ISLAND.z0 + 2, ISLAND.x1 - 2, 0.12, ISLAND.z1 - 2, '#f3e6d0', { su: 4, sv: 4, sides: true });
+  for (const x of [ISLAND_ROAD_X - 11, ISLAND_ROAD_X + 7]) walks.box(x, -0.1, ISLAND.z0 + 4, x + 4, 0.12, ISLAND.z1 - 4, '#f3e6d0', { su: 4, sv: 4 });
+  for (const z of [-160, 160]) for (const o of [-11, 7]) walks.box(512, -0.1, z + o, ISLAND_ROAD_X - 11, 0.12, z + o + 4, '#f3e6d0', { su: 4, sv: 4 });
+  walks.box(ISLAND.x1 - 14, -0.1, ISLAND.z0 + 4, ISLAND.x1 - 2, 0.12, ISLAND.z1 - 4, '#e8d8b8', { su: 4, sv: 4 });
   group.add(mesh(walks.build(), std({ map: surfaceTexture('sidewalk') }), { cast: false }));
   group.add(mesh(parks.build(), std({ map: grass }), { cast: false }));
   group.add(mesh(plazas.build(), std({ map: surfaceTexture('plaza') }), { cast: false }));

@@ -129,6 +129,7 @@ export function createCityLayout(seed = 1987) {
   for (const [x0, z0, x1, z1, h, style] of [
     [606, -250, 640, -200, 38, 'glass'], [606, -120, 636, -40, 14, 'deco'], [606, 40, 650, 110, 22, 'deco'],
     [540, -130, 576, -60, 10, 'industrial'], [540, 60, 576, 130, 12, 'stucco'], [606, 196, 640, 250, 64, 'glass'],
+    [520, -250, 570, -196, 16, 'deco'], [522, -40, 572, 36, 30, 'glass'], [606, -20, 640, 24, 18, 'stucco'], [658, -120, 672, -70, 12, 'deco'], [522, 178, 572, 248, 14, 'deco'], [652, 186, 672, 250, 26, 'deco'],
   ]) buildings.push({ x0, z0, x1, z1, h, style, color: islandRng.pick(PALETTES[style]), roof: 'mech', seed: islandRng.next(), tiers: h > 40 ? [0.7] : null });
 
   // Road graph: grid intersections plus the two island junctions past the bridges.
@@ -153,7 +154,7 @@ export function createCityLayout(seed = 1987) {
   roads.push({ x0: ISLAND_ROAD_X, z0: -160, x1: ISLAND_ROAD_X, z1: 160 });
 
   const ramps = [
-    { x: -40, z: 446, dx: 0, dz: 1, len: 14, w: 7, h: 3.4, name: 'Boardwalk Leap' },
+    { x: -60, z: 458, dx: 1, dz: 0, len: 14, w: 7, h: 3.4, name: 'Boardwalk Leap' },
     { x: 180, z: -280, dx: 1, dz: 0, len: 14, w: 7, h: 3.8, name: 'Scrapyard Hop' },
     { x: -470, z: 0, dx: -1, dz: 0, len: 16, w: 7, h: 4.2, name: 'Cerro Launch' },
     { x: 650, z: -150, dx: 0, dz: -1, len: 14, w: 7, h: 3.6, name: 'Marina Flyer' },

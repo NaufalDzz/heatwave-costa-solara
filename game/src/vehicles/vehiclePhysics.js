@@ -72,6 +72,7 @@ export function stepVehicle(v, input, dt, collision) {
   }
   if (g <= -3 && v.y <= -0.5) {
     v.sinking = true;
+    v.airborne = false; v.vy = 0;
     v.y = Math.max(v.y - dt * 0.6, -2.4);
     v.vx *= 1 - dt * 2; v.vz *= 1 - dt * 2;
   }

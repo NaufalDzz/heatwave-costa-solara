@@ -19,6 +19,8 @@ void main(){
   vec3 bloom = texture2D(b0, vUv).rgb * 0.5 + texture2D(b1, vUv).rgb * 0.7 + texture2D(b2, vUv).rgb * 0.9 + texture2D(b3, vUv).rgb * 1.1;
   c += bloom * strength;
   c *= grade;
+  float luma = dot(c, vec3(0.299, 0.587, 0.114));
+  c = max(mix(vec3(luma), c, 1.18), 0.0);
   vec2 q = vUv - 0.5;
   c *= 1.0 - dot(q, q) * 0.55;
   gl_FragColor = vec4(c, 1.0);

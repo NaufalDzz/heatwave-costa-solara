@@ -187,7 +187,7 @@ export function createActivities(game) {
   };
 
   game.events.on('landed', ({ airTime }) => {
-    if (!lastRamp || game.time - lastRamp.t > 4 || airTime < 0.9) return;
+    if (!lastRamp || game.time - lastRamp.t > 4 || airTime < 0.6) return;
     const r = layout.ramps[lastRamp.i];
     const first = !stunts.has(lastRamp.i);
     stunts.add(lastRamp.i);

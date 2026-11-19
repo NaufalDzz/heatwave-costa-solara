@@ -23,7 +23,8 @@ void main(){
     cos(p.y*0.18+time*1.1)*0.06 + cos(p.x*0.5-p.y*0.7+time*1.7)*0.035 + cos(p.x*1.9-time*2.7)*0.015));
   vec3 v = normalize(cameraPosition - vWorld);
   float fres = pow(1.0 - max(dot(n, v), 0.0), 3.0);
-  vec3 col = mix(deep, skyColor, 0.25 + fres * 0.6);
+  vec3 shallow = deep * vec3(1.6, 1.9, 1.5) + vec3(0.02, 0.08, 0.06);
+  vec3 col = mix(mix(deep, shallow, 0.4 + 0.3 * sin(p.x * 0.01 + p.y * 0.013)), skyColor, 0.06 + fres * 0.38);
   vec3 r = reflect(-v, n);
   float spec = pow(max(dot(r, normalize(sunDir)), 0.0), 180.0);
   float glitter = pow(max(dot(r, normalize(sunDir)), 0.0), 24.0) * 0.35;
@@ -186,7 +187,7 @@ export function buildWaterfront(scene, sky) {
       waterMat.uniforms.time.value += dt;
       waterMat.uniforms.skyColor.value.copy(scene.fog.color);
       waterMat.uniforms.night.value = sky.nightFactor;
-      waterMat.uniforms.deep.value.set(sky.nightFactor > 0.5 ? '#07243a' : '#0f5e7a');
+      waterMat.uniforms.deep.value.set(sky.nightFactor > 0.5 ? '#07243a' : '#0a5f80');
       const t = waterMat.uniforms.time.value;
       for (const b of boats) {
         b.position.y = -1 + Math.sin(t * 1.2 + b.userData.phase) * 0.15;
