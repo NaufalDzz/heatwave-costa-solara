@@ -25,7 +25,7 @@ const wheelMaterial = new THREE.MeshStandardMaterial({ color: '#1a1a1a', roughne
 const hubGeometry = new THREE.CylinderGeometry(0.22, 0.22, 0.32, 8).rotateZ(Math.PI / 2);
 const hubMaterial = new THREE.MeshStandardMaterial({ color: '#c9ccd1', roughness: 0.3, metalness: 0.8 });
 export const sirenRed = new THREE.MeshBasicMaterial({ color: '#ff2a2a', toneMapped: false });
-export const sirenBlue = new THREE.MeshBasicMaterial({ color: '#2a6bff', toneMapped: false });
+export const sirenBlue = new THREE.MeshBasicMaterial({ color: '#4a90ff', toneMapped: false });
 const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
 
 export function buildVehicleMesh(typeKey, paint) {
@@ -61,8 +61,12 @@ export function buildVehicleMesh(typeKey, paint) {
   parts.push({ geometry: box(W + 0.06, 0.28, 0.25), color: trim, matrix: makeMatrix(0, base + 0.15, -L / 2) });
   parts.push({ geometry: box(W + 0.04, 0.16, L * 0.6), color: trim, matrix: makeMatrix(0, base + 0.1, 0) });
   if (typeKey === 'police') {
-    parts.push({ geometry: box(W + 0.01, 0.42, L * 0.5), color: '#14213d', matrix: makeMatrix(0, base + hb * 0.5, -L * 0.02) });
-    parts.push({ geometry: box(W * 0.9, 0.08, 0.4), color: '#14213d', matrix: makeMatrix(0, top + 0.05, L * 0.35) });
+    // SCPD livery: white body, a thin navy belt line with a sky-blue pinstripe and a navy hood stripe,
+    // so the cruiser reads as a bright police car even in low sunset light.
+    parts.push({ geometry: box(W + 0.01, 0.13, L * 0.92), color: '#16306b', matrix: makeMatrix(0, base + hb * 0.62, 0) });
+    parts.push({ geometry: box(W + 0.02, 0.05, L * 0.92), color: '#4fc3ff', matrix: makeMatrix(0, base + hb * 0.62 - 0.1, 0) });
+    parts.push({ geometry: box(0.36, 0.08, L * 0.28), color: '#16306b', matrix: makeMatrix(0, top + 0.05, L * 0.33, 0.08, 0, 0) });
+    parts.push({ geometry: box(W * 0.75, 0.12, 0.18), color: '#1a1a1a', matrix: makeMatrix(0, base + 0.3, L / 2 + 0.2) });
   }
   if (typeKey === 'taxi') parts.push({ geometry: box(W + 0.01, 0.12, L), color: '#111111', matrix: makeMatrix(0, base + hb * 0.55, 0) });
   if (typeKey === 'sports') parts.push({ geometry: box(W * 0.9, 0.06, 0.4), color: '#111111', matrix: makeMatrix(0, top + 0.38, -L / 2 + 0.25) }, { geometry: box(0.08, 0.36, 0.1), color: '#111111', matrix: makeMatrix(0.6, top + 0.18, -L / 2 + 0.25) }, { geometry: box(0.08, 0.36, 0.1), color: '#111111', matrix: makeMatrix(-0.6, top + 0.18, -L / 2 + 0.25) });
@@ -83,8 +87,8 @@ export function buildVehicleMesh(typeKey, paint) {
   body.add(new THREE.Mesh(mergeParts(lightParts), lightMaterial));
   const sirens = [];
   if (typeKey === 'police') {
-    const red = new THREE.Mesh(box(0.6, 0.16, 0.3), sirenRed), blue = new THREE.Mesh(box(0.6, 0.16, 0.3), sirenBlue);
-    red.position.set(-0.36, top + hc + 0.14, -0.1); blue.position.set(0.36, top + hc + 0.14, -0.1);
+    const red = new THREE.Mesh(box(0.72, 0.22, 0.36), sirenRed), blue = new THREE.Mesh(box(0.72, 0.22, 0.36), sirenBlue);
+    red.position.set(-0.4, top + hc + 0.16, -0.1); blue.position.set(0.4, top + hc + 0.16, -0.1);
     body.add(red, blue);
     sirens.push(red, blue);
   }

@@ -8,10 +8,11 @@ import { damp, angleDiff } from '../core/mathUtils.js';
 function buildHeli() {
   const root = new THREE.Group();
   const body = new THREE.Mesh(mergeParts([
-    { geometry: new THREE.SphereGeometry(1.6, 12, 8).scale(1, 0.85, 1.5), color: '#1b2a4a', matrix: makeMatrix(0, 0, 0) },
+    { geometry: new THREE.SphereGeometry(1.6, 12, 8).scale(1, 0.85, 1.5), color: '#eef2f7', matrix: makeMatrix(0, 0, 0) },
+    { geometry: new THREE.SphereGeometry(1.62, 12, 8).scale(1, 0.3, 1.52), color: '#16306b', matrix: makeMatrix(0, -0.2, 0) },
     { geometry: new THREE.SphereGeometry(1.25, 12, 8).scale(1, 0.8, 1.1), color: '#9fd3ff', matrix: makeMatrix(0, 0.25, 1.15) },
     { geometry: new THREE.BoxGeometry(3.25, 0.5, 2.2), color: '#f2f2f2', matrix: makeMatrix(0, -0.35, -0.2) },
-    { geometry: new THREE.CylinderGeometry(0.35, 0.18, 5.5, 8).rotateX(Math.PI / 2), color: '#1b2a4a', matrix: makeMatrix(0, 0.3, -4.2) },
+    { geometry: new THREE.CylinderGeometry(0.35, 0.18, 5.5, 8).rotateX(Math.PI / 2), color: '#16306b', matrix: makeMatrix(0, 0.3, -4.2) },
     { geometry: new THREE.BoxGeometry(0.15, 1.4, 0.9), color: '#f2f2f2', matrix: makeMatrix(0, 0.9, -6.7) },
     { geometry: new THREE.BoxGeometry(0.1, 0.1, 3.4), color: '#333', matrix: makeMatrix(-1.1, -1.55, 0) },
     { geometry: new THREE.BoxGeometry(0.1, 0.1, 3.4), color: '#333', matrix: makeMatrix(1.1, -1.55, 0) },
@@ -31,7 +32,7 @@ function buildHeli() {
   const tail = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2, 0.2), bladeMat);
   tail.position.set(0.2, 0.9, -6.7);
   root.add(tail);
-  const red = new THREE.Mesh(new THREE.SphereGeometry(0.16), new THREE.MeshBasicMaterial({ color: '#ff2020', toneMapped: false }));
+  const red = new THREE.Mesh(new THREE.SphereGeometry(0.28), new THREE.MeshBasicMaterial({ color: '#ff2020', toneMapped: false }));
   red.position.set(0, -0.7, -0.5);
   root.add(red);
   return { root, rotor, tail, red };

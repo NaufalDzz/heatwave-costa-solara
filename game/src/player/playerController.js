@@ -141,7 +141,12 @@ export function createPlayer(game, x, z) {
     di.nitro = !locked && input.isDown('ShiftLeft') && hasNitro && di.throttle > 0;
     if (di.nitro) {
       p.nitro = Math.max(0, p.nitro - dt * 0.25);
-      game.particles.emit('flash', v.x - Math.sin(v.heading) * v.spec.len * 0.55, v.y + 0.45, v.z - Math.cos(v.heading) * v.spec.len * 0.55, 1, { jitter: 0.1 });
+      // Twin blue exhaust jets blown backwards from both tail pipes.
+      const fx = Math.sin(v.heading), fz = Math.cos(v.heading), back = v.spec.len * 0.55;
+      for (const side of [-0.45, 0.45]) {
+        const ex = v.x - fx * back + fz * side, ez = v.z - fz * back - fx * side;
+        game.particles.emit('nitro', ex, v.y + 0.42, ez, 3, { jitter: 0.08, vx: v.vx - fx * 26, vz: v.vz - fz * 22 });
+      }
     } else p.nitro = Math.min(1, p.nitro + dt * 0.05);
     if (!locked && input.wasPressed('KeyH')) { v.horn = 0.5; game.audio?.horn(); game.events.emit('horn', { x: v.x, z: v.z }); }
     if (v.sinking && v.y < -1.5) { p.exitVehicle(); return; }

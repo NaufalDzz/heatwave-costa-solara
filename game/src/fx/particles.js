@@ -16,6 +16,7 @@ const PRESETS = {
   flame: { add: true, life: [0.25, 0.55], size: [1.4, 0.4], color: ['#ffe08a', '#ff5a1a'], alpha: [1, 0], vel: [0.6, 2.5, 0.6], gravity: -3, drag: 1 },
   spark: { add: true, life: [0.2, 0.5], size: [0.35, 0.1], color: ['#fff2b0', '#ff9a30'], alpha: [1, 0], vel: [7, 6, 7], gravity: 14, drag: 0.5 },
   streak: { add: true, life: [0.05, 0.09], size: [0.45, 0.2], color: ['#fff6c0', '#ffb040'], alpha: [1, 0], vel: [0, 0, 0], gravity: 0, drag: 0 },
+  nitro: { add: true, life: [0.14, 0.26], size: [1.5, 0.5], color: ['#bff4ff', '#1f5bff'], alpha: [0.75, 0], vel: [0.3, 0.2, 0.3], gravity: 0, drag: 0 },
   flash: { add: true, life: [0.05, 0.08], size: [1.6, 2.2], color: ['#fff6c8', '#ffb040'], alpha: [1, 0], vel: [0, 0, 0], gravity: 0, drag: 0 },
   blast: { add: true, life: [0.5, 0.9], size: [5, 9], color: ['#ffb84d', '#ff2a00'], alpha: [0.55, 0], vel: [9, 7, 9], gravity: -1, drag: 3 },
   smoke: { add: false, life: [1.6, 2.8], size: [1.6, 5.5], color: ['#4a4a4a', '#8a8580'], alpha: [0.55, 0], vel: [1, 2.2, 1], gravity: -1.2, drag: 0.8 },

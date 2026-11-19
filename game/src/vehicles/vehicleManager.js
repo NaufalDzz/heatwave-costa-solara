@@ -21,7 +21,7 @@ export function createVehicleManager(game) {
   glow.material.uniforms.intensity.value = 1;
   scene.add(glow);
   const gPos = glow.geometry.attributes.position, gCol = glow.geometry.attributes.color, gSize = glow.geometry.attributes.size;
-  const headColor = new THREE.Color('#fff2c8'), tailColor = new THREE.Color('#ff2020'), red = new THREE.Color('#ff2020'), blue = new THREE.Color('#2a6bff');
+  const headColor = new THREE.Color('#fff2c8'), tailColor = new THREE.Color('#ff2020'), red = new THREE.Color('#ff2020'), blue = new THREE.Color('#2a6bff'), nitroColor = new THREE.Color('#7fd8ff');
   const tmp = new THREE.Vector3();
 
   // Real headlight beams for the car the player drives.
@@ -160,7 +160,8 @@ export function createVehicleManager(game) {
           game.particles.emit('flame', v.x, v.y + 1, v.z, 1, { jitter: 1.6 });
           if (game.rng.next() < 0.4) game.particles.emit('blacksmoke', v.x, v.y + 2, v.z, 1, { jitter: 1 });
         }
-        for (const [k, s] of v.parts.sirens.entries()) s.visible = v.siren ? Math.sin(game.time * 14 + k * Math.PI) > -0.2 : true;
+        // The light bar stays lit; its glow sprites pulse red and blue in turn (updateLights).
+        for (const s of v.parts.sirens) s.visible = !v.exploded;
         mgr.sync(v);
       }
       collideVehicles();
@@ -227,7 +228,7 @@ export function createVehicleManager(game) {
     const cam = game.camera.position;
     const lit = nf > 0.3;
     for (const v of list) {
-      if (v.exploded || v.sinking || n > MAX_LIGHTS - 6) continue;
+      if (v.exploded || v.sinking || n > MAX_LIGHTS - 8) continue;
       if (Math.abs(v.x - cam.x) > 260 || Math.abs(v.z - cam.z) > 260) continue;
       v.parts.root.updateMatrixWorld();
       const braking = v.input.throttle < 0 && v.speed > 1;
@@ -235,18 +236,25 @@ export function createVehicleManager(game) {
       for (const p of v.parts.headLocal) {
         tmp.copy(p).applyMatrix4(v.parts.root.matrixWorld);
         gPos.setXYZ(n, tmp.x, tmp.y, tmp.z); gCol.setXYZ(n, headColor.r, headColor.g, headColor.b);
-        gSize.setX(n, occupied && lit ? 4.5 : 0); n++;
+        gSize.setX(n, occupied && lit ? (v === playerCar ? 0.95 : 0.85) : 0); n++;
       }
       for (const p of v.parts.tailLocal) {
         tmp.copy(p).applyMatrix4(v.parts.root.matrixWorld);
         gPos.setXYZ(n, tmp.x, tmp.y, tmp.z); gCol.setXYZ(n, tailColor.r, tailColor.g, tailColor.b);
-        gSize.setX(n, occupied ? (braking ? 3.2 : lit ? 2 : 0) : 0); n++;
+        gSize.setX(n, occupied ? (braking ? 1.2 : lit ? 0.8 : 0) : 0); n++;
+      }
+      if (v === playerCar && game.player.driveInput.nitro) {
+        // Nitro: a hot blue bloom at each tail pipe on top of the particle jets.
+        for (const p of v.parts.tailLocal) {
+          tmp.set(p.x * 0.55, p.y - 0.12, p.z - 0.35).applyMatrix4(v.parts.root.matrixWorld);
+          gPos.setXYZ(n, tmp.x, tmp.y, tmp.z); gCol.setXYZ(n, nitroColor.r, nitroColor.g, nitroColor.b); gSize.setX(n, 1.5); n++;
+        }
       }
       if (v.siren) {
         for (const [k, s] of v.parts.sirens.entries()) {
           s.getWorldPosition(tmp);
           const c = k ? blue : red;
-          gPos.setXYZ(n, tmp.x, tmp.y + 0.1, tmp.z); gCol.setXYZ(n, c.r, c.g, c.b); gSize.setX(n, s.visible ? 16 : 7); n++;
+          gPos.setXYZ(n, tmp.x, tmp.y + 0.1, tmp.z); gCol.setXYZ(n, c.r, c.g, c.b); gSize.setX(n, v.siren && Math.sin(game.time * 14 + k * Math.PI) > -0.2 ? 2.8 : 1.7); n++;
         }
       }
     }
@@ -255,7 +263,7 @@ export function createVehicleManager(game) {
     glow.geometry.setDrawRange(0, n);
     const target = playerCar && !playerCar.exploded ? playerCar : null;
     beams.forEach((b, k) => {
-      b.intensity = target && lit ? 400 : 0;
+      b.intensity = target && lit ? 260 * nf * nf : 0;
       if (!target) return;
       tmp.copy(target.parts.headLocal[k]).applyMatrix4(target.parts.root.matrixWorld);
       b.position.copy(tmp);

@@ -6,7 +6,8 @@ const STEP = 1 / 60;
 
 function simulate(game, seconds, each) {
   const n = Math.round(seconds / STEP);
-  for (let i = 0; i < n; i++) { each?.(i * STEP); game.update(STEP); }
+  // The camera moves every step too, so systems that cull by camera distance (car lights) see the shot.
+  for (let i = 0; i < n; i++) { each?.(i * STEP); game.cameraRig.update(STEP); game.update(STEP); }
 }
 
 function progress(game, jobIndex) {
@@ -107,50 +108,55 @@ export async function stageShot(game, name, title) {
     for (let i = 0; i < 3; i++) { game.frame(STEP); await frames(); }
     return;
   }
-  // Cover: the finale's five-star escape along the beach at sunset.
+  // Cover: the finale's five-star escape along the beach at sunset. The Vortex GT burns nitro
+  // towards the camera with four SCPD cruisers in a wedge behind it, Air-1 overhead and a
+  // rammed cruiser exploding at the back of the pack.
   progress(game, 9);
   game.sky.setHour(19.45);
   player.teleport(40, 380);
   game.startPlay();
-  clearAround(game, 40, 398, 90);
+  clearAround(game, 40, 398, 120);
   const car = vehicles.spawn('sports', 40, 398, -Math.PI / 2, { color: '#ff2d55', persistent: true });
   player.enterVehicle(car);
-  car.vx = -30;
   game.missions.jumpTo(9, 2);
   game.radio.set(0);
-  const units = [[47, 394.4, -30], [52, 401.8, -30], [-16, 393.8, 0], [60, 397.8, -30]].map(([x, z, vx]) => {
-    const u = police.spawnUnitNear(x, z, -Math.PI / 2);
-    u.vehicle.vx = vx;
-    return u;
-  });
+  // Wedge formation, offsets in metres behind (+x) and beside (z) the player's car.
+  const wedge = [[8, -2.8], [9, 2.8], [17, 0.2], [25, -3], [28, 3]];
+  const units = wedge.map(([dx, dz]) => police.spawnUnitNear(40 + dx, 398 + dz, -Math.PI / 2));
   police.helicopter.spawn(true);
-  // Oncoming traffic and a crowd scattering on the promenade.
   game.traffic.spawnOnLane(114, 115, 0, 0.35, 'sedan');
   game.traffic.spawnOnLane(113, 114, 1, 0.7, 'van');
-  for (let k = 0; k < 10; k++) {
-    const h = game.peds.add(-8 + k * 3.1, 409.5 + (k % 3) * 1.6, null, 0);
+  for (let k = 0; k < 12; k++) {
+    const h = game.peds.add(-14 + k * 2.6, 409.5 + (k % 3) * 1.6, null, 0);
     h.y = 0.18; h.ped.state = 'flee'; h.ped.fear = 9; h.ped.fromX = 30; h.ped.fromZ = 398;
   }
-  Object.assign(police.helicopter, { x: 8, z: 388, y: 34, aimX: 30, aimZ: 398 });
+  game.cameraRig.override = (cam) => {
+    cam.position.set(car.x - 9.5, car.y + 4.6, car.z + 6.5);
+    cam.lookAt(car.x + 6, car.y + 2.0, car.z - 3.2);
+  };
   game.input.simulate('KeyW', true);
+  game.input.simulate('ShiftLeft', true);
   let exploded = false;
-  simulate(game, 1.35, (t) => {
-    if (!exploded && t > 1.05) {
+  const SPEED = 31;
+  simulate(game, 1.4, (t) => {
+    car.vz = 0; car.z = 398; car.heading = -Math.PI / 2; car.vx = -SPEED;
+    // Keep the pack in its wedge while their own AI drives (sirens, ramming, lights).
+    units.forEach((u, k) => {
+      const v = u.vehicle;
+      if (v.exploded) return;
+      v.x = car.x + wedge[k][0]; v.z = 398 + wedge[k][1]; v.vx = -SPEED; v.vz = 0; v.heading = -Math.PI / 2;
+    });
+    if (!exploded && t > 1.1) {
       exploded = true;
-      const v = units[2].vehicle;
+      const v = units[4].vehicle;
       v.lastHitByPlayer = game.time;
       vehicles.explode(v);
     }
-    car.vz = 0; car.z = 398; car.heading = -Math.PI / 2; car.vx = -30;
   });
-  car.condition = Math.max(car.condition, 74);
-  game.dialogue.hold('lexi', 'Air-1 is right on top of you! Stay on the beach road and burn that nitro!');
+  car.condition = Math.max(car.condition, 82);
+  game.dialogue.clear();
   const heli = police.helicopter;
-  Object.assign(heli, { x: car.x - 4, z: car.z + 5, y: 13, aimX: car.x + 1, aimZ: car.z, heading: Math.PI / 2 + 0.5 });
+  Object.assign(heli, { x: car.x + 30, z: car.z - 7, y: 12, aimX: car.x + 15, aimZ: car.z - 2, heading: -Math.PI / 2 + 0.5 });
   heli.update(0, true);
-  game.cameraRig.override = (cam) => {
-    cam.position.set(car.x + 19, car.y + 5.6, car.z + 7.5);
-    cam.lookAt(car.x - 10, car.y + 3.4, car.z - 1.5);
-  };
   for (let i = 0; i < 3; i++) { game.frame(STEP); await frames(); }
 }
