@@ -3,16 +3,76 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Block Dodger</title>
-<style>
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #11141b; }
-  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
-  /* Read aloud, never shown: the status line screen readers announce. */
-  #status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-</style>
+<title>HEATWAVE: Costa Solara</title>
+<link rel="stylesheet" href="./styles/game.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.min.js" } }</script>
 </head>
 <body>
-<canvas id="game" aria-label="Block Dodger: move the paddle left and right to dodge falling blocks and catch coins"></canvas>
+<canvas id="scene" aria-label="HEATWAVE: Costa Solara, an open-world crime game"></canvas>
+<div id="vignette"></div>
+<div id="flash-overlay"></div>
+
+<div id="hud" class="hidden">
+  <div id="left-stack" class="corner-tl">
+  <section id="mission-panel" class="panel">
+    <div class="mp-head"><span id="mp-tag">STORY</span><span id="mp-timer"></span></div>
+    <div id="mp-title"></div>
+    <div id="mp-stages"></div>
+    <div id="mp-objective"></div>
+    <div id="mp-extra"></div>
+  </section>
+  <section id="dispatch-panel" class="panel">
+    <div class="dp-head"><span>SCPD DISPATCH</span><span id="dp-level"></span></div>
+    <div id="dp-units"></div>
+  </section>
+  </div>
+  <section id="top-right" class="corner-tr">
+    <div id="clock-row"><span id="clock">00:00</span><span id="day">MON</span></div>
+    <div id="money">$0</div>
+    <div id="stars"></div>
+    <div id="rank-row"><span id="rank-name"></span><div class="bar"><i id="rank-fill"></i></div></div>
+    <div id="weapon-bar"></div>
+    <div id="ammo"></div>
+  </section>
+  <section id="minimap-wrap" class="corner-bl">
+    <canvas id="minimap" width="240" height="240"></canvas>
+    <div id="vitals"><div class="bar hp"><i id="hp-fill"></i></div><div class="bar ar"><i id="ar-fill"></i></div></div>
+    <div id="district"></div>
+  </section>
+  <section id="vehicle-panel" class="corner-br">
+    <canvas id="speedo" width="220" height="220"></canvas>
+    <div id="veh-name"></div>
+    <div id="veh-meta"><span>COND</span><div class="bar cond"><i id="veh-cond"></i></div><span>NOS</span><div class="bar nos"><i id="veh-nos"></i></div></div>
+  </section>
+  <section id="radio-toast"><div id="radio-freq"></div><div><b id="radio-name"></b><span id="radio-song"></span></div></section>
+  <section id="dialogue" class="hidden"><canvas id="portrait" width="120" height="120"></canvas><div><div id="dlg-name"></div><div id="dlg-text"></div></div></section>
+  <div id="reticle"><i></i><i></i><i></i><i></i></div>
+  <div id="help-toast"></div>
+  <div id="notify"></div>
+  <div id="area-name"></div>
+</div>
+<div id="big-message"><div id="big-title"></div><div id="big-sub"></div></div>
+
+<div id="title-screen" class="hidden">
+  <div id="title-logo"><div class="logo-main">HEATWAVE</div><div class="logo-sub">COSTA SOLARA</div><div class="logo-tag">The sun sets. The city wakes.</div></div>
+  <nav id="title-menu">
+    <button id="btn-continue">CONTINUE</button>
+    <div id="save-card"></div>
+    <button id="btn-new">NEW GAME</button>
+    <button id="btn-controls">CONTROLS</button>
+  </nav>
+  <div id="title-controls" class="hidden"></div>
+  <div id="title-foot">Press ENTER to play · An original open-world crime story</div>
+</div>
+
+<div id="pause-menu" class="hidden">
+  <div id="pm-header"><div class="logo-small">HEATWAVE</div><nav id="pm-tabs"></nav><div id="pm-stats-line"></div></div>
+  <div id="pm-body"></div>
+  <div id="pm-foot">ESC Resume · Q/E Switch tab · Click the map to set a waypoint</div>
+</div>
+
+<div id="shop-menu" class="hidden"><div id="shop-title"></div><div id="shop-list"></div><div id="shop-foot">Click to buy · ESC to leave</div></div>
+<div id="loading"><div class="logo-main">HEATWAVE</div><div id="loading-text">Building Costa Solara…</div></div>
 <p id="status" role="status" aria-live="polite"></p>
 <script type="module" src="./src/main.js"></script>
 </body>
