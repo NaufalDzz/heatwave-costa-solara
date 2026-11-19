@@ -72,10 +72,12 @@ export function createEffects(scene, particles, rng) {
     tracer(ax, ay, az, bx, by, bz, color = '#ffe9a8') {
       if (tracers.length >= MAX_TRACERS) tracers.shift();
       tracers.push({ a: [ax, ay, az], b: [bx, by, bz], t: 0, c: new THREE.Color(color) });
+      const len = Math.hypot(bx - ax, by - ay, bz - az), n = Math.min(40, Math.floor(len / 1.5));
+      for (let i = 1; i < n; i++) { const f = i / n; particles.emit('streak', ax + (bx - ax) * f, ay + (by - ay) * f, az + (bz - az) * f, 1, { jitter: 0 }); }
     },
     muzzle(x, y, z) {
-      particles.emit('flash', x, y, z, 2, { jitter: 0.1 });
-      fx.flash(x, y, z, 14, '#ffcf70');
+      particles.emit('flash', x, y, z, 3, { jitter: 0.15, scale: 1.4 });
+      fx.flash(x, y, z, 30, '#ffcf70');
     },
     impact(x, y, z, kind) {
       if (kind === 'flesh') particles.emit('blood', x, y, z, 8, { jitter: 0.2 });

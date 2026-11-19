@@ -23,7 +23,7 @@ export function renderCityMap(layout, { labels = true } = {}) {
     g.fillStyle = b.kind === 'park' ? '#3f7d3a' : '#3c4352';
     rect(b.bx0, b.bz0, b.bx1, b.bz1);
     g.fillStyle = DISTRICTS[b.district].color;
-    g.globalAlpha = 0.18; rect(b.bx0, b.bz0, b.bx1, b.bz1); g.globalAlpha = 1;
+    g.globalAlpha = 0.3; rect(b.bx0, b.bz0, b.bx1, b.bz1); g.globalAlpha = 1;
   }
   g.fillStyle = 'rgba(200,210,230,0.42)';
   for (const b of layout.buildings) rect(b.x0, b.z0, b.x1, b.z1);

@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { VEHICLE_TYPES, buildVehicleMesh, burntMaterial } from './vehicleModels.js';
 import { stepVehicle } from './vehiclePhysics.js';
-import { createGlowPoints } from '../world/streetProps.js';
+import { createGlowPoints } from '../fx/glowSprites.js';
 import { heightAt } from '../world/cityLayout.js';
 import { damp } from '../core/mathUtils.js';
 
@@ -92,7 +92,7 @@ export function createVehicleManager(game) {
       v.exploded = true; v.condition = 0;
       v.parts.shell.material = burntMaterial;
       for (const s of v.parts.sirens) s.visible = false;
-      game.fx.explosion(v.x, v.y, v.z, 1.2);
+      game.fx.explosion(v.x, v.y, v.z, 1.5);
       game.audio?.explosion(v.x, v.z);
       v.vy = 6; v.airborne = true;
       for (const h of game.humanoids()) {
@@ -160,7 +160,7 @@ export function createVehicleManager(game) {
           game.particles.emit('flame', v.x, v.y + 1, v.z, 1, { jitter: 1.6 });
           if (game.rng.next() < 0.4) game.particles.emit('blacksmoke', v.x, v.y + 2, v.z, 1, { jitter: 1 });
         }
-        for (const [k, s] of v.parts.sirens.entries()) s.visible = v.siren ? Math.sin(game.time * 14 + k * Math.PI) > 0 : true;
+        for (const [k, s] of v.parts.sirens.entries()) s.visible = v.siren ? Math.sin(game.time * 14 + k * Math.PI) > -0.2 : true;
         mgr.sync(v);
       }
       collideVehicles();
@@ -244,10 +244,9 @@ export function createVehicleManager(game) {
       }
       if (v.siren) {
         for (const [k, s] of v.parts.sirens.entries()) {
-          if (!s.visible) continue;
           s.getWorldPosition(tmp);
           const c = k ? blue : red;
-          gPos.setXYZ(n, tmp.x, tmp.y + 0.1, tmp.z); gCol.setXYZ(n, c.r, c.g, c.b); gSize.setX(n, 13); n++;
+          gPos.setXYZ(n, tmp.x, tmp.y + 0.1, tmp.z); gCol.setXYZ(n, c.r, c.g, c.b); gSize.setX(n, s.visible ? 16 : 7); n++;
         }
       }
     }

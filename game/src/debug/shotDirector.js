@@ -91,6 +91,13 @@ export async function stageShot(game, name, title) {
       for (const h of game.peds.list) if (Math.hypot(h.x - 320, h.z - 55) < 40) { h.ped.state = 'flee'; h.ped.fear = 8; h.ped.fromX = 320; h.ped.fromZ = 70; }
       player.hero.x = 319; player.hero.z = 40; player.hero.health = 100;
     });
+    // A last burst so tracers and muzzle flashes are in the frame.
+    const volley = (tgt) => {
+      const o = { x: player.hero.x + 0.4, y: player.hero.y + 1.45, z: player.hero.z + 0.6 };
+      const d = { x: tgt.x - o.x, y: tgt.y + 1.2 - o.y, z: tgt.z - o.z }, l = Math.hypot(d.x, d.y, d.z);
+      game.weapons.fire(player.hero, o, { x: d.x / l, y: d.y / l, z: d.z / l }, { id: 'smg', damage: 1, range: 110, spread: 0.01 }, { byPlayer: true, muzzle: [o.x, o.y, o.z] });
+    };
+    volley(goons[1]); game.update(STEP); game.update(STEP); volley(goons[0]); game.update(STEP);
     game.dialogue.hold('lexi', 'Coyotes, three of them outside Club Azure. Light them up, Nico. I have your back.');
     game.cameraRig.override = (cam) => {
       const h = player.hero;
@@ -102,7 +109,7 @@ export async function stageShot(game, name, title) {
   }
   // Cover: the finale's five-star escape along the beach at sunset.
   progress(game, 9);
-  game.sky.setHour(19.6);
+  game.sky.setHour(19.45);
   player.teleport(40, 380);
   game.startPlay();
   clearAround(game, 40, 398, 90);
@@ -111,7 +118,7 @@ export async function stageShot(game, name, title) {
   car.vx = -30;
   game.missions.jumpTo(9, 2);
   game.radio.set(0);
-  const units = [[52, 394.6, -29.5], [58, 401.6, -29.5], [-14, 393.6, 0], [64, 398, -29]].map(([x, z, vx]) => {
+  const units = [[47, 394.4, -30], [52, 401.8, -30], [-16, 393.8, 0], [60, 397.8, -30]].map(([x, z, vx]) => {
     const u = police.spawnUnitNear(x, z, -Math.PI / 2);
     u.vehicle.vx = vx;
     return u;
@@ -135,8 +142,8 @@ export async function stageShot(game, name, title) {
   Object.assign(heli, { x: car.x - 4, z: car.z + 5, y: 13, aimX: car.x + 1, aimZ: car.z, heading: Math.PI / 2 + 0.5 });
   heli.update(0, true);
   game.cameraRig.override = (cam) => {
-    cam.position.set(car.x + 30, car.y + 8, car.z + 11);
-    cam.lookAt(car.x - 8, car.y + 4.2, car.z - 1.5);
+    cam.position.set(car.x + 24, car.y + 7, car.z + 9.5);
+    cam.lookAt(car.x - 9, car.y + 3.6, car.z - 1.5);
   };
   for (let i = 0; i < 3; i++) { game.frame(STEP); await frames(); }
 }
