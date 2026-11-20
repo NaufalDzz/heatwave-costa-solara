@@ -263,7 +263,7 @@ export function createVehicleManager(game) {
     glow.geometry.setDrawRange(0, n);
     const target = playerCar && !playerCar.exploded ? playerCar : null;
     beams.forEach((b, k) => {
-      b.intensity = target && lit ? 260 * nf * nf : 0;
+      b.intensity = target && nf > 0.45 ? 260 * nf * nf : 0; // beams only once dusk has turned to night
       if (!target) return;
       tmp.copy(target.parts.headLocal[k]).applyMatrix4(target.parts.root.matrixWorld);
       b.position.copy(tmp);

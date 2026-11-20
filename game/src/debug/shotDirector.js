@@ -166,7 +166,7 @@ export async function stageShot(game, name, title) {
   car.condition = Math.max(car.condition, 82);
   game.dialogue.clear();
   const heli = police.helicopter;
-  Object.assign(heli, { x: car.x + 30, z: car.z - 7, y: 12, aimX: car.x + 15, aimZ: car.z - 2, heading: -Math.PI / 2 + 0.5 });
+  Object.assign(heli, { x: car.x + 19, z: car.z - 8, y: 10.5, aimX: car.x + 14, aimZ: car.z - 1, heading: -Math.PI / 2 + 0.7 });
   heli.update(0, true);
   for (let i = 0; i < 3; i++) { game.frame(STEP); await frames(); }
 }
