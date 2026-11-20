@@ -149,6 +149,21 @@ export function buildWaterfront(scene, sky) {
     beachParts.push({ geometry: new THREE.ConeGeometry(2.6, 1.2, 4), color: '#ff5d5d', matrix: makeMatrix(tx, 5, tz, 0, Math.PI / 4, 0) });
     beachParts.push({ geometry: new THREE.BoxGeometry(0.8, 0.1, 4), color: '#ffffff', matrix: makeMatrix(tx, 1.2, tz - 3, -0.6, 0, 0) });
   }
+  // Palmera Pier: a timber deck on piles out past the surf, rails, lamp posts and a striped pavilion.
+  const PIER = { x: -40, z0: BEACH_END - 40, z1: BEACH_END + 120, w: 9 };
+  const pz = (PIER.z0 + PIER.z1) / 2, plen = PIER.z1 - PIER.z0;
+  beachParts.push({ geometry: new THREE.BoxGeometry(PIER.w, 0.5, plen), color: '#a0764f', matrix: makeMatrix(PIER.x, 2.2, pz) });
+  for (let z = PIER.z0 + 4; z < PIER.z1; z += 8) for (const s of [-1, 1]) {
+    beachParts.push({ geometry: new THREE.CylinderGeometry(0.3, 0.3, 8, 6), color: '#6b4a2e', matrix: makeMatrix(PIER.x + s * (PIER.w / 2 - 0.4), -1.8, z) });
+    beachParts.push({ geometry: new THREE.BoxGeometry(0.15, 1.1, 8), color: '#f1f1f1', matrix: makeMatrix(PIER.x + s * (PIER.w / 2 - 0.1), 3, z + 4) });
+    if (z % 16 < 8) {
+      beachParts.push({ geometry: new THREE.CylinderGeometry(0.08, 0.1, 4.2, 5), color: '#2b2b2b', matrix: makeMatrix(PIER.x + s * (PIER.w / 2 - 0.3), 4.5, z) });
+      lampPoints.push(new THREE.Vector3(PIER.x + s * (PIER.w / 2 - 0.3), 6.8, z));
+    }
+  }
+  for (let k = 0; k < 8; k++) beachParts.push({ geometry: new THREE.BoxGeometry(14 / 8, 0.15, 12), color: k % 2 ? '#ffffff' : '#ff4f6d', matrix: makeMatrix(PIER.x - 7 + (k + 0.5) * (14 / 8), 8.2, PIER.z1 - 6, 0, 0, 0) });
+  beachParts.push({ geometry: new THREE.BoxGeometry(12, 5.4, 10), color: '#7bdff2', matrix: makeMatrix(PIER.x, 5.1, PIER.z1 - 6) });
+  beachParts.push({ geometry: new THREE.BoxGeometry(16, 0.4, 16), color: '#a0764f', matrix: makeMatrix(PIER.x, 2.2, PIER.z1 - 6) });
   // Lighthouse at the island's north-east point.
   const lh = { x: ISLAND.x1 - 12, z: ISLAND.z0 + 12 };
   for (let s = 0; s < 6; s++) beachParts.push({ geometry: new THREE.CylinderGeometry(3.4 - s * 0.3, 3.7 - s * 0.3, 4, 12), color: s % 2 ? '#d62828' : '#ffffff', matrix: makeMatrix(lh.x, 2 + s * 4, lh.z) });

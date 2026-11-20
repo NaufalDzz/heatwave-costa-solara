@@ -144,7 +144,7 @@ export async function stageShot(game, name, title) {
   player.teleport(X0, Z + 8);
   game.startPlay();
   clearAround(game, X0 - 60, Z, 200);
-  const car = vehicles.spawn('sports', X0, Z, -Math.PI / 2, { color: '#ff2d55', persistent: true });
+  const car = vehicles.spawn('sports', X0, Z, -Math.PI / 2, { color: '#e8112d', persistent: true });
   player.enterVehicle(car);
   game.missions.jumpTo(9, 2);
   game.radio.set(0);
@@ -171,13 +171,22 @@ export async function stageShot(game, name, title) {
       if (v.exploded) return;
       v.x = car.x + pack[k][0]; v.z = Z + pack[k][1]; v.vx = -SPEED; v.vz = 0; v.heading = -Math.PI / 2 + (k === 5 ? 0.5 : 0);
     });
-    if (!exploded && t > 0.9) {
+    if (!exploded && t > 1.2) {
       exploded = true;
       const v = units[5].vehicle;
       v.lastHitByPlayer = game.time;
       vehicles.explode(v);
       police.placeRoadblock();
     }
+  });
+  // Civilian traffic: two cars coming the other way and a slow one in the right lane ahead.
+  game.traffic.spawnOnLane(115, 116, 0, 0.72, 'taxi');
+  game.traffic.spawnOnLane(115, 116, 1, 0.5, 'van');
+  game.traffic.spawnOnLane(116, 115, 1, 0.55, 'suv');
+  for (const u of units) if (u.id % 2 === 0) u.fireTimer = 0.06;
+  simulate(game, 0.12, () => {
+    car.vz = 0; car.z = Z; car.heading = -Math.PI / 2; car.vx = -SPEED;
+    units.slice(0, 5).forEach((u, k) => { const v = u.vehicle; v.x = car.x + pack[k][0]; v.z = Z + pack[k][1]; v.vx = -SPEED; v.vz = 0; v.heading = -Math.PI / 2; });
   });
   car.condition = Math.max(car.condition, 82);
   game.dialogue.hold('lexi', 'Two cruisers on your doors and Air-1 overhead! Say the word and I pull them off you.');

@@ -9,7 +9,8 @@ import { GRID, HALF_ROAD, roadCoord, ISLAND, ISLAND_ROAD_X, COAST } from './city
 import { createRng } from '../core/rng.js';
 
 const SIGNS = [['CLUB AZURE', '#3cf0ff'], ['MOTEL FLAMINGO', '#ff4fb0'], ['BAR 77', '#ffd23c'], ['TACO LUNA', '#7dff6a'],
-  ['ARCADE', '#c77dff'], ['VOLT LOUNGE', '#40a8ff'], ['PINK PALMS', '#ff6fd8'], ['KARAOKE', '#ff8c3c']];
+  ['ARCADE', '#c77dff'], ['VOLT LOUNGE', '#40a8ff'], ['PINK PALMS', '#ff6fd8'], ['KARAOKE', '#ff8c3c'],
+  ['SURF SHACK', '#3cf0ff'], ['GELATO', '#ff6fd8'], ['HOTEL CORAL', '#ffd23c'], ['TIKI BAR', '#7dff6a']];
 
 function mesh(geometry, material, { cast = true, receive = true } = {}) {
   const m = new THREE.Mesh(geometry, material);
@@ -135,12 +136,16 @@ export function buildCity(layout) {
       }
     }
     if (b.sign) {
-      const [text, colorHex] = SIGNS[Math.floor(b.seed * SIGNS.length)];
+      const [text, colorHex] = b.sign === 'blade' ? SIGNS[8 + Math.floor(b.seed * 4)] : SIGNS[Math.floor(b.seed * 8)];
       const sb = signBuilders.get(text) || signBuilders.set(text, { b: new GeometryBuilder(), color: colorHex }).get(text);
       const y = Math.min(b.h - 2, 7 + b.seed * 6), x = b.sign === 'west' ? b.x0 - 0.4 : b.x1 + 0.4;
       const sw = Math.min(14, d - 2) / 2, sh = sw / 4 * 1.0;
       const uv = [0, 0, 1, 0, 1, 1, 0, 1];
-      if (b.sign === 'east') sb.b.quad([x, y - sh, cz + sw], [x, y - sh, cz - sw], [x, y + sh, cz - sw], [x, y + sh, cz + sw], uv, white);
+      if (b.sign === 'blade') {
+        // A neon blade sign sticking out over the boulevard sidewalk, read from along the street.
+        const bx = b.x0 + 2 + b.seed * 4, by = Math.min(b.h - 3, 6 + b.seed * 3);
+        sb.b.quad([bx, by - 1, b.z1 + 4.6], [bx, by - 1, b.z1 + 0.4], [bx, by + 1, b.z1 + 0.4], [bx, by + 1, b.z1 + 4.6], uv, white);
+      } else if (b.sign === 'east') sb.b.quad([x, y - sh, cz + sw], [x, y - sh, cz - sw], [x, y + sh, cz - sw], [x, y + sh, cz + sw], uv, white);
       else sb.b.quad([x, y - sh, cz - sw], [x, y - sh, cz + sw], [x, y + sh, cz + sw], [x, y + sh, cz - sw], uv, white);
     }
     if ((b.style === 'glass' || b.style === 'stucco') && b.h > 20 && b.h < 70 && b.seed < 0.22) billboards.push(b);

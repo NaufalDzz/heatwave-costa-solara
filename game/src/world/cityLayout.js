@@ -90,8 +90,8 @@ function buildBlock(block, rng) {
       out.push({ x0: x, z0: z, x1: x + w, z1: z + d, h: rng.range(10, 34), style: 'brick', color: pal('brick'), sign: a === 0 ? 'west' : 'east', roof: 'mech', seed: rng.next() });
     });
   } else if (district === 'palmera') {
-    grid(2, 2, 6, (x, z, w, d) => {
-      out.push({ x0: x + 1, z0: z + 1, x1: x + w - 1, z1: z + d - 1, h: rng.range(12, 32), style: 'deco', color: pal('deco'), tiers: rng.chance(0.5) ? [0.8] : null, roof: 'deco', seed: rng.next() });
+    grid(2, 2, 6, (x, z, w, d, a, b) => {
+      out.push({ x0: x + 1, z0: z + 1, x1: x + w - 1, z1: z + d - 1, h: rng.range(12, 32), style: 'deco', color: pal('deco'), tiers: rng.chance(0.5) ? [0.8] : null, roof: 'deco', seed: rng.next(), sign: b === 1 && block.bj === 9 ? 'blade' : null });
     });
   } else if (district === 'heights') {
     grid(3, 3, 6, (x, z, w, d) => {

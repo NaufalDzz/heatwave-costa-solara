@@ -63,10 +63,10 @@ export function createPoliceDispatch(game) {
     unit.deployed = true;
   }
 
-  /** At four stars the passenger leans out and fires at a car alongside or ahead. */
+  /** At four stars every other cruiser carries a shooter who leans out of the window and fires. */
   function windowFire(unit, v, d, dt) {
     unit.fireTimer = (unit.fireTimer ?? 1 + game.rng.next()) - dt;
-    if (game.wanted.level < 4 || d > 30 || unit.fireTimer > 0) return;
+    if (unit.id % 2 || game.wanted.level < 4 || d > 30 || unit.fireTimer > 0) return;
     unit.fireTimer = 0.9 + game.rng.next() * 0.8;
     const p = game.player.position;
     if (!game.collision.lineOfSight(v.x, v.y + 1.4, v.z, p.x, p.y + 1, p.z)) return;
@@ -179,8 +179,8 @@ export function createPoliceDispatch(game) {
     dispatchRows() {
       const p = game.player.position;
       const rows = units.filter((u) => u.vehicle && !u.vehicle.removed).map((u) => ({ callsign: u.callsign, kind: u.officers.length && u.deployed ? 'Officers' : u.kind, icon: u.deployed ? 'foot' : 'car', dist: Math.round(Math.hypot(u.vehicle.x - p.x, u.vehicle.z - p.z)), status: u.vehicle.exploded ? 'DOWN' : u.status }));
-      if (helicopter.active) rows.push({ callsign: 'AIR-1', kind: 'Sparrow Heli', icon: 'heli', dist: Math.round(Math.hypot(helicopter.x - p.x, helicopter.z - p.z)), status: game.crew?.blackout ? 'SCRAMBLED' : helicopter.spotting ? 'SPOTLIGHT' : 'SEARCHING' });
-      return rows.sort((a, b) => (a.status === 'DOWN') - (b.status === 'DOWN') || a.dist - b.dist);
+      if (helicopter.active) rows.unshift({ callsign: 'AIR-1', kind: 'Sparrow Heli', icon: 'heli', dist: Math.round(Math.hypot(helicopter.x - p.x, helicopter.z - p.z)), status: game.crew?.blackout ? 'SCRAMBLED' : helicopter.spotting ? 'SPOTLIGHT' : 'SEARCHING' });
+      return rows.sort((a, b) => (a.status === 'DOWN') - (b.status === 'DOWN') || (b.icon === 'heli') - (a.icon === 'heli') || a.dist - b.dist);
     },
     allHumanoids: () => officers,
     reset() { while (units.length) removeUnit(units[0]); helicopter.dismiss(true); bustTimer = 0; },

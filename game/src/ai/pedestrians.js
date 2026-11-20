@@ -6,7 +6,7 @@ import { randomLook } from '../characters/humanoidModel.js';
 import { heightAt, COAST } from '../world/cityLayout.js';
 import { angleDiff } from '../core/mathUtils.js';
 
-const TARGET = 46, SPAWN_MIN = 22, SPAWN_MAX = 120, DESPAWN = 150;
+const TARGET = 60, SPAWN_MIN = 22, SPAWN_MAX = 120, DESPAWN = 150;
 
 export function createPedestrians(game) {
   const list = [];

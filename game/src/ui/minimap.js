@@ -7,7 +7,7 @@ import { routeBetween } from '../ai/roadGraph.js';
 export function createMinimap(game, canvas, mapImage) {
   const g = canvas.getContext('2d');
   const S = canvas.width, R = S / 2;
-  const scale = 0.5; // radar pixels per map pixel
+  const scale = 0.38; // radar pixels per map pixel
   let route = null, routeKey = '', routeAge = 0;
 
   return {
