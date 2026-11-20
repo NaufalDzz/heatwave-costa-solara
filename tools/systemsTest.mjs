@@ -130,6 +130,19 @@ await step(3);
 await run(() => window.__game.input.simulate('KeyW', false));
 check(await run(() => window.__game.economy.stats.stuntJumps >= 1), 'flying off a ramp scores a unique stunt');
 
+// The rank-7 Riptide launcher: locked in the shop until the rank, then one rocket wrecks a car.
+check(await run(() => window.__game.garageShop.items('weapons').find((i) => i.id === 'launcher')?.locked === true), 'the launcher is locked below rank 7');
+const rocket = await run(() => {
+  const g = window.__game; if (g.player.vehicle) g.player.exitVehicle(true);
+  g.economy.respect = 16000; g.weapons.give('launcher', 3); g.weapons.select(5);
+  const h = g.player.hero, v = g.vehicles.spawn('sedan', h.x + 14, h.z, 0, { parked: true });
+  const o = { x: h.x + 1, y: h.y + 1.4, z: h.z }, d = { x: v.x - o.x, y: v.y + 0.8 - o.y, z: v.z - o.z }, l = Math.hypot(d.x, d.y, d.z);
+  g.weapons.fire(h, o, { x: d.x / l, y: d.y / l, z: d.z / l }, g.weapons.current(), { byPlayer: true });
+  return { id: g.weapons.current().id, exploded: v.exploded };
+});
+check(rocket.id === 'launcher' && rocket.exploded, `a Riptide rocket wrecks a car (${JSON.stringify(rocket)})`);
+await run(() => { const g = window.__game; g.wanted.clear(); g.police.reset(); g.weapons.select(1); });
+
 // Wasted and busted.
 await run(() => { const g = window.__game; g.player.exitVehicle(true); g.player.hero.damage(500, 0, 0); });
 await step(6);

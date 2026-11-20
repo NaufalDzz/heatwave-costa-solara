@@ -3,7 +3,7 @@
 import { WEAPONS } from '../combat/weapons.js';
 
 /** Paint a weapon silhouette (white on transparent) into a canvas. */
-export function drawWeaponIcon(id, color = '#f4f4f4') {
+function drawWeaponIcon(id, color = '#f4f4f4') {
   const c = document.createElement('canvas');
   c.width = 116; c.height = 70;
   const g = c.getContext('2d');

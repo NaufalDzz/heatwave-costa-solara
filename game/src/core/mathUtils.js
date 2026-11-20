@@ -10,7 +10,6 @@ export function angleDiff(a, b) {
   if (d < -Math.PI) d += Math.PI * 2;
   return d;
 }
-export const dist2 = (ax, az, bx, bz) => Math.hypot(ax - bx, az - bz);
 export const smoothstep = (a, b, x) => {
   const t = clamp((x - a) / (b - a), 0, 1);
   return t * t * (3 - 2 * t);
