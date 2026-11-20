@@ -97,19 +97,25 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0c14; fon
 @keyframes blink { 50% { opacity: 0.25; } }
 
 /* Title screen */
-#title-screen { position: fixed; inset: 0; background: linear-gradient(90deg, rgba(10,4,30,0.86) 0%, rgba(20,6,40,0.55) 38%, rgba(0,0,0,0) 65%); }
+#title-screen { position: fixed; inset: 0; background: linear-gradient(90deg, rgba(10,4,30,0.9) 0%, rgba(20,6,40,0.7) 36%, rgba(0,0,0,0) 62%); }
 #title-logo { position: absolute; left: 6vw; top: 9vh; }
 .logo-main { font: italic 900 110px 'Arial Black', Arial, sans-serif; letter-spacing: -2px; background: linear-gradient(180deg, #fff6a8 0%, #ffb347 35%, #ff4fa3 70%, #8a2be2 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 6px 0 rgba(0,0,0,0.45)) drop-shadow(0 0 30px rgba(255,79,163,0.45)); line-height: 1; }
 .logo-sub { font: italic 900 30px 'Arial Black', Arial; letter-spacing: 16px; color: var(--teal); margin-top: 6px; text-shadow: 0 0 16px rgba(47,230,216,0.7); }
 .logo-tag { font-size: 18px; color: #ffd6f0; margin-top: 10px; letter-spacing: 2px; }
-#title-menu { position: absolute; left: 6vw; top: 46vh; display: flex; flex-direction: column; gap: 10px; width: 380px; }
-#title-menu button { font: italic 900 30px 'Arial Black', Arial; text-align: left; color: #fff; background: none; border: none; border-left: 5px solid transparent; padding: 4px 14px; cursor: pointer; pointer-events: auto; }
+#title-menu { position: absolute; left: 6vw; top: 44vh; display: flex; flex-direction: column; gap: 8px; width: 440px; }
+#title-menu button { font: italic 900 40px 'Arial Black', Arial; text-align: left; color: #fff; background: none; border: none; border-left: 7px solid transparent; padding: 4px 16px; cursor: pointer; pointer-events: auto; text-shadow: 0 3px 0 rgba(0,0,0,0.6), 0 0 14px rgba(0,0,0,0.6); }
 #title-menu button:hover, #title-menu button.sel { border-left-color: var(--pink); background: linear-gradient(90deg, rgba(255,79,163,0.35), rgba(255,79,163,0)); }
 #title-menu button:disabled { color: #666; }
-#save-card { margin: -4px 0 6px 19px; padding: 10px 14px; background: rgba(0,0,0,0.45); border: 1px solid var(--line); border-radius: 6px; font-size: 14px; line-height: 1.5; color: #dfe7ff; }
+#save-card { margin: -2px 0 8px 23px; padding: 12px 16px; background: rgba(6,4,18,0.82); border: 1px solid rgba(255,207,74,0.45); border-left: 4px solid var(--gold); border-radius: 6px; font-size: 19px; font-weight: 700; line-height: 1.4; color: #f2f5ff; }
+#save-card .sc-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; color: #b9c2dd; }
+#save-card .sc-head b { font-size: 17px; letter-spacing: 1px; }
+#save-card .sc-title { font: italic 900 24px 'Arial Black', Arial; color: #fff; margin: 2px 0; }
+#save-card .sc-bar { height: 8px; margin: 8px 0 4px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; }
+#save-card .sc-bar i { display: block; height: 100%; background: linear-gradient(90deg, #ff4fa3, #ffcf4a); }
+#save-card .sc-foot { font-size: 16px; color: #ffd6f0; }
 #save-card:empty { display: none; }
 #save-card b { color: var(--gold); }
-#title-foot { position: absolute; bottom: 22px; left: 6vw; font-size: 14px; color: #ccc; letter-spacing: 1px; }
+#title-foot { position: absolute; bottom: 22px; left: 6vw; font-size: 17px; font-weight: 700; color: #e8e8f0; letter-spacing: 1px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
 #title-controls, .controls-grid { display: grid; grid-template-columns: auto auto; gap: 4px 18px; font-size: 15px; }
 #title-controls { position: absolute; left: calc(6vw + 400px); top: 46vh; background: rgba(0,0,0,0.6); padding: 16px 20px; border-radius: 8px; border: 1px solid var(--line); }
 kbd { font: 800 13px Arial; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 1px 6px; }

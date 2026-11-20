@@ -21,7 +21,8 @@ export function createTitleScreen(game, { onNewGame, onContinue }) {
     latest = game.save.latest();
     btnContinue.disabled = !latest;
     const s = summarize(latest);
-    card.innerHTML = s ? `<b>${latest.slot === 'auto' ? 'AUTOSAVE' : 'SLOT ' + latest.slot}</b> · ${s.savedAt}<br>${s.title}<br>${s.money} · Rank ${s.rankLevel} ${s.rank} · ${s.time}<br>${s.pct}% complete` : '';
+    // Large, high-contrast lines so the save summary still reads on a thumbnail.
+    card.innerHTML = s ? `<div class="sc-head"><b>${latest.slot === 'auto' ? 'AUTOSAVE' : 'SLOT ' + latest.slot}</b><span>${s.savedAt}</span></div><div class="sc-title">${s.title}</div><div>${s.money} · Rank ${s.rankLevel} ${s.rank}</div><div class="sc-bar"><i style="width:${s.pct}%"></i></div><div class="sc-foot">${s.pct}% complete · ${s.time}</div>` : '';
     sel = latest ? 0 : 1;
     highlight();
   }
