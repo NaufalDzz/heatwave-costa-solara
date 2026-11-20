@@ -38,7 +38,7 @@ export function createCrew(game) {
     for (const h of game.missions.enemyBlips()) out.push({ x: h.x, y: h.y + 2.5, z: h.z });
     for (const h of game.police.officers) if (h.alive) out.push({ x: h.x, y: h.y + 2.5, z: h.z });
     for (const v of game.police.units()) out.push({ x: v.x, y: v.y + 2.8, z: v.z });
-    return out.filter((o) => Math.hypot(o.x - p.x, o.z - p.z) < 120);
+    return out.filter((o) => Math.hypot(o.x - p.x, o.z - p.z) < 160);
   }
 
   const crew = {

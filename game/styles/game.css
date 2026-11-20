@@ -17,7 +17,7 @@ kbd { font: 900 13px var(--heavy); background: rgba(255,255,255,0.16); border: 1
 .corner { position: absolute; }
 .tl { left: 14px; top: 12px; transform: scale(var(--k)); transform-origin: top left; }
 .tr { right: 14px; top: 10px; transform: scale(var(--k)); transform-origin: top right; }
-.mr { right: 14px; top: calc(274px * var(--k)); transform: scale(var(--k)); transform-origin: top right; }
+.mr { right: 14px; top: calc(288px * var(--k)); transform: scale(var(--k)); transform-origin: top right; }
 .bl { left: 14px; bottom: 12px; transform: scale(var(--k)); transform-origin: bottom left; }
 .br { right: 14px; bottom: 12px; transform: scale(var(--k)); transform-origin: bottom right; }
 .tc { left: 50%; top: 12px; transform: translateX(-50%) scale(var(--k)); transform-origin: top center; }
@@ -138,7 +138,7 @@ kbd { font: 900 13px var(--heavy); background: rgba(255,255,255,0.16); border: 1
 #radio-toast { display: flex; gap: 10px; align-items: center; background: var(--panel); border-radius: 30px; border: 2px solid rgba(255,79,163,0.5); padding: 5px 18px 5px 5px; transition: opacity 0.5s; opacity: 0; white-space: nowrap; }
 #radio-freq { width: 44px; height: 44px; border-radius: 50%; background: conic-gradient(var(--pink), var(--gold), var(--teal), var(--pink)); display: grid; place-items: center; font: 900 12px var(--heavy); color: #111; text-shadow: none; }
 #radio-toast b { display: block; font: italic 900 17px var(--heavy); color: var(--teal); } #radio-toast span { font: 800 13px var(--heavy); color: #eee; }
-#dialogue { width: 590px; display: flex; gap: 13px; align-items: center; background: var(--panel); border-left: 7px solid var(--pink); border-radius: 12px; padding: 9px 16px 10px 9px; box-shadow: 0 4px 0 rgba(0,0,0,0.35); }
+#dialogue { width: 556px; display: flex; gap: 13px; align-items: center; background: var(--panel); border-left: 7px solid var(--pink); border-radius: 12px; padding: 9px 16px 10px 9px; box-shadow: 0 4px 0 rgba(0,0,0,0.35); }
 #portrait { width: 82px; height: 82px; border-radius: 8px; border: 3px solid var(--gold); flex: none; }
 .dlg-head { display: flex; align-items: baseline; gap: 10px; }
 #dlg-name { font: italic 900 19px var(--heavy); color: var(--gold); }

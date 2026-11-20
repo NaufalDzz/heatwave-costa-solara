@@ -13,7 +13,7 @@ const check = (ok, what) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${what}`); i
 
 async function open(query, size = { width: 1280, height: 800 }) {
   const page = await browser.newPage({ viewport: size });
-  page.on('console', (m) => { if (m.type() === 'error') errors.push(`[${query}] console.error: ${m.text()}`); });
+  page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(`[${query}] console.${m.type()}: ${m.text()}`); });
   page.on('pageerror', (e) => errors.push(`[${query}] pageerror: ${e.message}\n${e.stack}`));
   await page.goto(url + query);
   await page.waitForFunction(() => window.__game && window.__game.mode !== 'loading', null, { timeout: 90000 });
@@ -106,7 +106,8 @@ check(police.rows > 0, 'dispatch board lists units');
 // 6. Story job: go to the first marker.
 await G(page, () => { const g = __game; g.wanted.clear(); g.police.reset(); g.player.teleport(-360, 173); });
 await waitGame(page, 1.5);
-check(await G(page, () => !!__game.missions.active), 'walking into the yellow marker starts job 1');
+const jobState = await G(page, () => ({ active: !!__game.missions.active, resp: __game.respawning, hp: __game.player.hero.health, veh: !!__game.player.vehicle, mode: __game.mode, act: !!__game.activities.active, idx: __game.missions.index, locked: __game.player.controlsLocked }));
+check(jobState.active, `walking into the yellow marker starts job 1 ${JSON.stringify(jobState)}`);
 for (let i = 0; i < 4; i++) { await page.keyboard.press('Enter'); await waitGame(page, 0.25); }
 await waitGame(page, 0.5);
 check(await G(page, () => __game.missions.hudInfo().objective.length > 3), 'mission panel shows an objective');
@@ -149,10 +150,27 @@ await page.close();
 const auto = await open('?autostart=1', { width: 900, height: 700 });
 await auto.waitForTimeout(1500);
 check(await G(auto, () => __game.mode === 'play'), '?autostart=1 skips straight into play');
-await auto.setViewportSize({ width: 1920, height: 1080 });
-await auto.waitForTimeout(500);
+// The HUD scales with the viewport: every panel stays on screen and no two panels overlap.
+const hudLayout = () => {
+  const ids = ['left-stack', 'status-stack', 'crew-cards', 'radar-stack', 'vehicle-panel', 'dialogue'];
+  const rects = ids.map((id) => [id, document.getElementById(id)]).filter(([, el]) => el && el.offsetParent !== null && getComputedStyle(el).display !== 'none').map(([id, el]) => [id, el.getBoundingClientRect()]);
+  const problems = [];
+  for (const [id, r] of rects) if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) problems.push(`${id} off screen`);
+  for (let i = 0; i < rects.length; i++) for (let j = i + 1; j < rects.length; j++) {
+    const [a, ra] = rects[i], [b, rb] = rects[j];
+    if (ra.left < rb.right - 1 && rb.left < ra.right - 1 && ra.top < rb.bottom - 1 && rb.top < ra.bottom - 1) problems.push(`${a} overlaps ${b}`);
+  }
+  return problems;
+};
+for (const [w, h] of [[1920, 1080], [1024, 640], [1280, 800]]) {
+  await auto.setViewportSize({ width: w, height: h });
+  await G(auto, () => { const g = __game; g.wanted.setLevel(3); const v = g.vehicles.spawn('sports', g.player.hero.x + 3, g.player.hero.z, 0, {}); g.player.enterVehicle(v); g.dialogue.hold('lexi', 'Layout check.'); });
+  await waitGame(auto, 1);
+  const problems = await G(auto, hudLayout);
+  check(problems.length === 0, `HUD fits ${w}x${h} without overlaps ${problems.join(', ')}`);
+}
 await auto.close();
-for (const shot of ['chase', 'shootout', 'pause', 'title']) {
+for (const shot of ['chase', 'shootout', 'garage', 'pause', 'title']) {
   const sp = await open(`?shot=${shot}&seed=1`);
   await sp.waitForFunction(() => window.__shotReady === true, null, { timeout: 120000 });
   check(true, `?shot=${shot} renders`);
