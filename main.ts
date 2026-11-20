@@ -3,8 +3,9 @@
 // its ES modules under game/src and three.js vendored as game/vendor/three.min.js, no network
 // request). It is an original 3D open-world crime game set in a sun-soaked coastal city: walk and
 // drive through seven districts, steal cars, fight, raise a five-star wanted level with SCPD
-// cruisers, roadblocks and the Air-1 helicopter, play a ten-job story with an original cast, race,
-// drive taxi fares, find Sun Tokens and hit stunt jumps, then save in one of three slots.
+// cruisers, roadblocks and the Air-1 helicopter, call a crew with their own abilities, tune cars
+// at the garage, play a ten-job story with an original cast, race, drive taxi fares, find Sun
+// Tokens and hit stunt jumps, then save in one of three slots.
 //
 // This program hands it in: it copies game/ and screenshots/ from beside this file to /output and
 // writes /output/dossier.json, the summary the judge reads, with the vendored make.fun library.
