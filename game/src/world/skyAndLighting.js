@@ -110,7 +110,7 @@ export function createSkyAndLighting(renderer, scene) {
     const h = out.hour;
     const theta = (Math.PI * (h - 6)) / 14;
     const elev = Math.sin(theta);
-    out.sunDir.set(Math.cos(theta), Math.max(elev, -0.2) * 0.85, 0.35 + 0.55 * clamp(theta / Math.PI, 0, 1)).normalize();
+    out.sunDir.set(Math.cos(theta), Math.max(elev, -0.2) * 0.85, 0.2 + 0.3 * clamp(theta / Math.PI, 0, 1)).normalize();
     out.nightFactor = clamp(1 - (elev + 0.05) / 0.25, 0, 1);
     skyMat.uniforms.top.value.copy(blend(1, 'color'));
     skyMat.uniforms.horizon.value.copy(blend(2, 'color'));

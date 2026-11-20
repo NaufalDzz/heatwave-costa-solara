@@ -89,14 +89,13 @@ export async function stageShot(game, name, title) {
     game.weapons.select(2);
     clearAround(game, -70, 400, 60);
     const goons = game.missions.context().enemies;
-    const spots = [[-80, 396.5], [-76.5, 403.5], [-71, 399.5], [-68, 408.5], [-64, 394], [-83, 391.5]];
+    const spots = [[-83, 396.5], [-80, 403.8], [-76, 399.5], [-73.5, 409], [-70, 394], [-86, 391.5]];
     goons[4].damage(999, P.x, P.z); goons[5].damage(999, P.x, P.z);
     const pin = () => goons.forEach((g, i) => { g.x = spots[i][0]; g.z = spots[i][1]; g.alerted = true; g.heading = -Math.PI / 2; });
     pin();
-    const wreck = vehicles.spawn('muscle', -73, 405.5, 0.5, { parked: true, color: '#1d3557' });
+    const wreck = vehicles.spawn('muscle', -70, 402.6, 0.9, { parked: true, color: '#1d3557' });
     wreck.condition = 0; wreck.burnTimer = -100;
     vehicles.spawn('van', -62, 392.8, Math.PI / 2, { parked: true, color: '#4cc9f0' });
-    crowd(game, 10, -90, 3.4, [410.5, 412, 389.5], -74, 400);
     game.wanted.setLevel(2);
     const unit = police.spawnUnitNear(-30, 398, -Math.PI / 2);
     unit.vehicle.vx = -12;
@@ -120,7 +119,8 @@ export async function stageShot(game, name, title) {
     game.traffic.spawnOnLane(114, 115, 0, 0.55, 'taxi');
     game.traffic.spawnOnLane(115, 114, 1, 0.62, 'suv');
     game.traffic.spawnOnLane(114, 115, 1, 0.8, 'sedan');
-    simulate(game, 0.25, () => { pin(); player.hero.x = P.x; player.hero.z = P.z; });
+    crowd(game, 12, -91, 2.6, [410.8, 412.3, 389.6], -78, 400);
+    simulate(game, 0.35, () => { pin(); player.hero.x = P.x; player.hero.z = P.z; });
     // A last exchange so muzzle flashes and tracers from both sides are in the frame.
     const nearMiss = { x: P.x + 4, y: -1.1, z: P.z + 3 };
     shoot(player.hero, goons[0], { byPlayer: true });
@@ -129,7 +129,6 @@ export async function stageShot(game, name, title) {
     shoot(goons[2], nearMiss, { friendly: true, damageScale: 0 });
     game.update(STEP);
     shoot(goons[3], nearMiss, { friendly: true, damageScale: 0 });
-    shoot(player.hero, goons[2], { byPlayer: true });
     game.update(STEP);
     player.hero.health = 88;
     game.dialogue.hold('lexi', 'Hale sold you out, Santi! Six Kroll guards on the boardwalk and Birdie has them painted.');
@@ -139,7 +138,7 @@ export async function stageShot(game, name, title) {
   // nitro away from the camera with two SCPD cruisers on its doors and more behind, Air-1's
   // searchlight on the roof, a rammed cruiser burning up the road and a roadblock beyond.
   progress(game, 9);
-  game.sky.setHour(18.25);
+  game.sky.setHour(18.55);
   const Z = 398.1, X0 = 150;
   player.teleport(X0, Z + 8);
   game.startPlay();
@@ -150,7 +149,7 @@ export async function stageShot(game, name, title) {
   game.radio.set(0);
   game.hud.holdRadio();
   // Formation, offsets in metres behind (+x) and beside (z) the player's car.
-  const pack = [[0.2, 3.4], [-1.4, -3.2], [7.5, 6.2], [8.5, -4.8], [16, 1.5], [-48, 4.2]];
+  const pack = [[0.2, 3.4], [-1.4, -3.2], [7.5, 6.2], [8.5, -4.8], [16, 1.5], [-36, 6.8]];
   const units = pack.map(([dx, dz]) => police.spawnUnitNear(X0 + dx, Z + dz, -Math.PI / 2));
   police.helicopter.spawn(true);
   game.traffic.spawnOnLane(114, 115, 0, 0.55, 'sedan');

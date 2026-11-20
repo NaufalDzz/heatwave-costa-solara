@@ -161,7 +161,7 @@ export function createVehicleManager(game) {
           if (v.condition < 45 && game.rng.next() < dt * (v.condition < 25 ? 14 : 6)) game.particles.emit(v.condition < 25 ? 'blacksmoke' : 'smoke', hx, v.y + 1.2, hz, 1, { scale: 0.6 });
           if (v.condition <= 0) {
             v.burnTimer += dt;
-            if (game.rng.next() < dt * 30) game.particles.emit('flame', hx, v.y + 1.1, hz, 1, { jitter: 0.8 });
+            if (game.rng.next() < dt * 30) game.particles.emit(game.rng.next() < 0.5 ? 'fire' : 'flame', hx, v.y + 1.1, hz, 1, { jitter: 0.7 });
             if (v.burnTimer > 3.5) mgr.explode(v);
           }
         } else if (game.rng.next() < dt * 10 && v.age < 9999) {
