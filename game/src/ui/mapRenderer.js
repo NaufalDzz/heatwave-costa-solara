@@ -42,17 +42,22 @@ export function renderCityMap(layout, { labels = true } = {}) {
     g.beginPath(); g.moveTo(a, b); g.lineTo(c2, d); g.stroke();
   }
   for (const br of BRIDGES) { g.fillStyle = '#f5efe0'; rect(br.x0, br.z - 8, br.x1, br.z + 8); }
-  if (!labels) return c;
-  // District names.
-  g.font = 'italic 900 30px Arial Black, Arial, sans-serif';
-  g.textAlign = 'center';
-  const spots = [['downtown', 40, -120], ['neon', 240, 80], ['palmera', -120, 470], ['heights', -280, -120], ['ironworks', 220, -300], ['midtown', -40, -330], ['marina', 600, 0], ['hills', -560, -560]];
-  for (const [id, x, z] of spots) {
-    const [a, b] = toMap(x, z);
-    g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillText(DISTRICTS[id].name.toUpperCase(), a + 2, b + 2);
-    g.fillStyle = DISTRICTS[id].color; g.fillText(DISTRICTS[id].name.toUpperCase(), a, b);
-  }
+  if (labels) drawDistrictLabels(g, toMap, 30);
   return c;
+}
+
+/** District names in their colours, placed through project(x, z) -> [px, py] at the given size. */
+export function drawDistrictLabels(g, project, fontPx, ids = null) {
+  g.font = `italic 900 ${fontPx}px Arial Black, Arial, sans-serif`;
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.lineJoin = 'round';
+  const spots = [['downtown', 0, -125], ['neon', 240, 80], ['palmera', -120, 465], ['heights', -280, 100], ['ironworks', 220, -300], ['midtown', -120, -330], ['marina', 600, -40], ['hills', -560, -560]];
+  for (const [id, x, z] of spots) {
+    if (ids && !ids.includes(id)) continue;
+    const [a, b] = project(x, z), name = DISTRICTS[id].name.toUpperCase();
+    g.lineWidth = Math.max(3, fontPx * 0.22); g.strokeStyle = 'rgba(8,10,22,0.9)'; g.strokeText(name, a, b);
+    g.fillStyle = DISTRICTS[id].color; g.fillText(name, a, b);
+  }
 }
 
 const ICONS = { house: 'H', wrench: 'W', gun: 'G', cross: '+', badge: 'P', taxi: 'T', flag: 'R', mission: '!', token: '☀', jump: 'J' };

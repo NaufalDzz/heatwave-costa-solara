@@ -1,7 +1,7 @@
 // The pause menu (ESC): MAP with legend and click-to-set waypoint, STORY progress and cast,
 // STATS and rank, CONTROLS, SETTINGS (sensitivity, invert, volumes, clock speed) and SAVE with
 // three slots plus the autosave.
-import { MAP, toMap, drawBlip, drawPlayerArrow } from './mapRenderer.js';
+import { MAP, toMap, drawBlip, drawPlayerArrow, drawDistrictLabels } from './mapRenderer.js';
 import { STORY } from '../missions/storyMissions.js';
 import { CAST, drawPortrait } from '../missions/storyCast.js';
 import { controlsHtml } from './titleScreen.js';
@@ -10,6 +10,10 @@ import { formatMoney, formatClock } from '../core/mathUtils.js';
 import { routeBetween } from '../ai/roadGraph.js';
 
 const TABS = ['MAP', 'STORY', 'STATS', 'CONTROLS', 'SETTINGS', 'SAVE'];
+// The pause map is fitted to the city itself (mainland grid, Palmera Beach and the Marina Azul
+// island) rather than the whole radar image, so the streets fill the panel. World metres.
+const VIEW = { x0: -425, z0: -445, w: 1135, h: 987 };
+const MAP_W = 1150, MAP_H = 1000;
 
 export function createPauseMenu(game) {
   const root = document.getElementById('pause-menu'), tabsEl = document.getElementById('pm-tabs'), body = document.getElementById('pm-body'), line = document.getElementById('pm-stats-line');
@@ -28,14 +32,14 @@ export function createPauseMenu(game) {
   function mapTab() {
     const legend = Object.values(game.layout.pois).map((p) => `<i style="background:${p.color}"></i><span>${p.name}</span>`).join('');
     const m = game.missions.active || STORY[game.missions.index];
-    body.innerHTML = `<canvas class="pm-map" width="900" height="900"></canvas><div class="pm-col"><div class="pm-card"><h3>LEGEND</h3><div class="legend">${legend}<i style="background:#ffcf4a"></i><span>Story job</span><i style="background:#ff3030"></i><span>SCPD units</span><i style="background:#ff9f1c"></i><span>Stunt jump</span><i style="background:#d36bff"></i><span>Waypoint (click map)</span></div></div>
+    body.innerHTML = `<canvas class="pm-map" width="${MAP_W}" height="${MAP_H}"></canvas><div class="pm-col"><div class="pm-card"><h3>LEGEND</h3><div class="legend">${legend}<i style="background:#ffcf4a"></i><span>Story job</span><i style="background:#ff3030"></i><span>SCPD units</span><i style="background:#ff9f1c"></i><span>Stunt jump</span><i style="background:#d36bff"></i><span>Waypoint (click map)</span></div></div>
       <div class="pm-card"><h3>CURRENT JOB</h3>${m ? `<b>${m.title}</b><br><span style="color:#ccc">${m.blurb}</span>` : 'Story complete'}</div>
       <div class="pm-card"><h3>CAREER</h3>${careerRows()}</div>${lastSave()}</div>`;
     const c = body.querySelector('canvas');
     drawMap(c);
     c.addEventListener('click', (e) => {
       const r = c.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width) * MAP.size + MAP.x0, z = ((e.clientY - r.top) / r.height) * MAP.size + MAP.z0;
+      const x = ((e.clientX - r.left) / r.width) * VIEW.w + VIEW.x0, z = ((e.clientY - r.top) / r.height) * VIEW.h + VIEW.z0;
       game.waypoint = { x, z };
       game.hud.notify('Waypoint set', '#d36bff');
       drawMap(c);
@@ -55,23 +59,26 @@ export function createPauseMenu(game) {
 
   function drawMap(c) {
     const g = c.getContext('2d');
-    const s = c.width / MAP.px;
-    g.drawImage(game.mapImage, 0, 0, c.width, c.height);
-    const P = (x, z) => toMap(x, z).map((v) => v * s);
+    const k = c.width / VIEW.w;
+    const [sx, sy] = toMap(VIEW.x0, VIEW.z0), src = MAP.px / MAP.size;
+    g.drawImage(game.mapImage, sx, sy, VIEW.w * src, VIEW.h * src, 0, 0, c.width, c.height);
+    const P = (x, z) => [(x - VIEW.x0) * k, (z - VIEW.z0) * k];
+    drawDistrictLabels(g, P, 34, ['downtown', 'neon', 'palmera', 'heights', 'ironworks', 'midtown', 'marina']);
     const p = game.player.position;
     const target = game.missions.gpsTarget() || game.waypoint;
     if (target) {
       const route = routeBetween(game.layout.nodes, p.x, p.z, target.x, target.z);
-      g.strokeStyle = '#ffcf4a'; g.lineWidth = 7; g.lineJoin = 'round'; g.shadowColor = '#ff9f1c'; g.shadowBlur = 10; g.beginPath();
+      g.strokeStyle = '#ffcf4a'; g.lineWidth = 10; g.lineJoin = 'round'; g.shadowColor = '#ff9f1c'; g.shadowBlur = 12; g.beginPath();
       route.forEach(([x, z], i) => { const [a, b] = P(x, z); i ? g.lineTo(a, b) : g.moveTo(a, b); });
       g.stroke(); g.shadowBlur = 0;
     }
     const zone = game.wanted.searchZone;
-    if (zone && game.wanted.level) { const [a, b] = P(zone.x, zone.z); g.beginPath(); g.arc(a, b, zone.r * s * (MAP.px / MAP.size), 0, Math.PI * 2); g.fillStyle = 'rgba(255,50,50,0.25)'; g.fill(); g.strokeStyle = '#ff4040'; g.lineWidth = 2; g.stroke(); }
-    for (const b of game.mapBlips()) { const [x, y] = P(b.x, b.z); drawBlip(g, x, y, b.color, b.icon, (b.size || 8) * 1.2); }
-    for (const v of game.police.units()) { const [x, y] = P(v.x, v.z); g.beginPath(); g.arc(x, y, 6, 0, Math.PI * 2); g.fillStyle = '#ff3030'; g.fill(); }
+    if (zone && game.wanted.level) { const [a, b] = P(zone.x, zone.z); g.beginPath(); g.arc(a, b, zone.r * k, 0, Math.PI * 2); g.fillStyle = 'rgba(255,50,50,0.25)'; g.fill(); g.strokeStyle = '#ff4040'; g.lineWidth = 3; g.stroke(); }
+    for (const b of game.mapBlips()) { const [x, y] = P(b.x, b.z); drawBlip(g, x, y, b.color, b.icon, (b.size || 8) * 2); }
+    for (const v of game.police.units()) { const [x, y] = P(v.x, v.z); g.beginPath(); g.arc(x, y, 10, 0, Math.PI * 2); g.fillStyle = '#ff3030'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#fff'; g.stroke(); }
     const [px, py] = P(p.x, p.z);
-    drawPlayerArrow(g, px, py, Math.PI - game.player.heading, 13);
+    g.beginPath(); g.arc(px, py, 34, 0, Math.PI * 2); g.fillStyle = 'rgba(255,79,163,0.28)'; g.fill();
+    drawPlayerArrow(g, px, py, Math.PI - game.player.heading, 26);
   }
 
   function storyTab() {

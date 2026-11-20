@@ -44,7 +44,7 @@ export async function stageShot(game, name, title) {
   if (name === 'pause') {
     progress(game, 4);
     game.sky.setHour(20.4);
-    player.teleport(250, 75, 0);
+    player.teleport(160, 205, Math.PI);
     game.startPlay();
     game.waypoint = { x: 600, z: 140 };
     game.save.write('1');
