@@ -21,7 +21,7 @@ export function createVehicleManager(game) {
   glow.material.uniforms.intensity.value = 1;
   scene.add(glow);
   const gPos = glow.geometry.attributes.position, gCol = glow.geometry.attributes.color, gSize = glow.geometry.attributes.size;
-  const headColor = new THREE.Color('#fff2c8'), tailColor = new THREE.Color('#ff2020'), red = new THREE.Color('#ff2020'), blue = new THREE.Color('#2a6bff'), nitroColor = new THREE.Color('#7fd8ff');
+  const headColor = new THREE.Color('#fff2c8'), tailColor = new THREE.Color('#ff2020'), red = new THREE.Color('#ff2020'), blue = new THREE.Color('#2a6bff'), nitroColor = new THREE.Color('#2f6bff');
   const tmp = new THREE.Vector3();
 
   // Real headlight beams for the car the player drives.
@@ -255,7 +255,7 @@ export function createVehicleManager(game) {
         // Nitro: a hot blue bloom at each tail pipe on top of the particle jets.
         for (const p of v.parts.tailLocal) {
           tmp.set(p.x * 0.55, p.y - 0.12, p.z - 0.35).applyMatrix4(v.parts.root.matrixWorld);
-          gPos.setXYZ(n, tmp.x, tmp.y, tmp.z); gCol.setXYZ(n, nitroColor.r, nitroColor.g, nitroColor.b); gSize.setX(n, 1.5); n++;
+          gPos.setXYZ(n, tmp.x, tmp.y, tmp.z); gCol.setXYZ(n, nitroColor.r, nitroColor.g, nitroColor.b); gSize.setX(n, 0.9); n++;
         }
       }
       if (v.siren) {

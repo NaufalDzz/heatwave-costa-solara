@@ -1,6 +1,6 @@
-// The pause menu (ESC): MAP with legend and click-to-set waypoint, STORY progress and cast,
-// STATS and rank, CONTROLS, SETTINGS (sensitivity, invert, volumes, clock speed) and SAVE with
-// three slots plus the autosave.
+// The pause menu (ESC): an OVERVIEW page with the city map (legend, click-to-set waypoint), the
+// story's ten jobs, career stats and the save slots side by side; then STORY with the cast,
+// STATS, CONTROLS, SETTINGS (sensitivity, invert, volumes, clock speed) and SAVE.
 import { MAP, toMap, drawBlip, drawPlayerArrow, drawDistrictLabels } from './mapRenderer.js';
 import { STORY } from '../missions/storyMissions.js';
 import { CAST, drawPortrait } from '../missions/storyCast.js';
@@ -9,7 +9,7 @@ import { SLOTS, summarize } from '../save/saveSystem.js';
 import { formatMoney, formatClock } from '../core/mathUtils.js';
 import { routeBetween } from '../ai/roadGraph.js';
 
-const TABS = ['MAP', 'STORY', 'STATS', 'CONTROLS', 'SETTINGS', 'SAVE'];
+const TABS = ['OVERVIEW', 'STORY', 'STATS', 'CONTROLS', 'SETTINGS', 'SAVE'];
 // The pause map is fitted to the city itself (mainland grid, Palmera Beach and the Marina Azul
 // island) rather than the whole radar image, so the streets fill the panel. World metres.
 const VIEW = { x0: -425, z0: -445, w: 1135, h: 987 };
@@ -26,15 +26,22 @@ export function createPauseMenu(game) {
     [...tabsEl.children].forEach((b, k) => b.classList.toggle('sel', k === i));
     const eco = game.economy, rank = eco.rankInfo();
     line.innerHTML = `${formatMoney(eco.money)}<br><small style="color:#ffd6f0">RANK ${rank.level} · ${rank.title} · DAY ${game.day} ${formatClock(game.sky.hour)}</small>`;
-    ({ MAP: mapTab, STORY: storyTab, STATS: statsTab, CONTROLS: controlsTab, SETTINGS: settingsTab, SAVE: saveTab })[TABS[i]]();
+    ({ OVERVIEW: mapTab, STORY: storyTab, STATS: statsTab, CONTROLS: controlsTab, SETTINGS: settingsTab, SAVE: saveTab })[TABS[i]]();
   }
 
   function mapTab() {
-    const legend = Object.values(game.layout.pois).map((p) => `<i style="background:${p.color}"></i><span>${p.name}</span>`).join('');
-    const m = game.missions.active || STORY[game.missions.index];
-    body.innerHTML = `<canvas class="pm-map" width="${MAP_W}" height="${MAP_H}"></canvas><div class="pm-col"><div class="pm-card"><h3>LEGEND</h3><div class="legend">${legend}<i style="background:#ffcf4a"></i><span>Story job</span><i style="background:#ff3030"></i><span>SCPD units</span><i style="background:#ff9f1c"></i><span>Stunt jump</span><i style="background:#d36bff"></i><span>Waypoint (click map)</span></div></div>
-      <div class="pm-card"><h3>CURRENT JOB</h3>${m ? `<b>${m.title}</b><br><span style="color:#ccc">${m.blurb}</span>` : 'Story complete'}</div>
-      <div class="pm-card"><h3>CAREER</h3>${careerRows()}</div>${lastSave()}</div>`;
+    const legend = [...Object.values(game.layout.pois).map((p) => [p.color, p.name.replace(/ (Safehouse|Garage|Arms|Medical|Depot|Races)$/, '')]), ['#ffcf4a', 'Story job'], ['#ff3030', 'SCPD unit'], ['#ff9f1c', 'Stunt jump'], ['#d36bff', 'Waypoint']]
+      .map(([c, n]) => `<i style="background:${c}"></i><span>${n}</span>`).join('');
+    const idx = game.missions.index;
+    const jobs = STORY.map((m, i) => `<div class="mission-row"><span class="st ${i < idx ? 'done' : i === idx ? 'active' : 'locked'}">${i < idx ? 'DONE' : i === idx ? 'NEXT' : 'LOCKED'}</span><b>${i + 1}. ${m.title}</b><span style="color:#aaa;margin-left:auto">${CAST[m.giver].name.replace(/".*" /, '')}</span></div>`).join('');
+    const slots = ['auto', '1', '2'].map((slot) => {
+      const sm = summarize(game.save.read(slot));
+      return `<div class="slot"><div class="info"><b>${slot === 'auto' ? 'AUTOSAVE' : 'SLOT ' + slot}</b> ${sm ? `· ${sm.title}<br>${sm.money} · Rank ${sm.rankLevel} ${sm.rank} · ${sm.time}` : '<br><span style="color:#888">Empty slot</span>'}</div>${sm ? `<span class="pct">${sm.pct}%</span>` : ''}</div>`;
+    }).join('');
+    body.innerHTML = `<div class="pm-mapwrap"><canvas class="pm-map" width="${MAP_W}" height="${MAP_H}"></canvas><div class="pm-card pm-legend"><div class="legend">${legend}</div></div></div>
+      <div class="pm-col"><div class="pm-card"><h3>STORY · ${game.missions.done.length}/${STORY.length} JOBS DONE</h3>${jobs}</div>
+      <div class="pm-card" style="--acc:var(--teal)"><h3>CAREER</h3><div class="stat-grid">${careerRows()}</div></div>
+      <div class="pm-card" style="--acc:var(--pink)"><h3>SAVE SLOTS</h3>${slots}</div></div>`;
     const c = body.querySelector('canvas');
     drawMap(c);
     c.addEventListener('click', (e) => {
@@ -49,13 +56,10 @@ export function createPauseMenu(game) {
 
   function careerRows() {
     const s = game.economy.stats;
-    return [['Jobs passed', `${game.missions.done.length}/${STORY.length}`], ['Sun Tokens', `${s.tokens}/30`], ['Stunt jumps', `${s.stuntJumps}/5`], ['Races won', s.racesWon], ['Cars stolen', s.carsStolen], ['Highest wanted', '★'.repeat(s.maxWanted) || '-']]
+    return [['Money earned', formatMoney(s.moneyEarned)], ['Sun Tokens', `${s.tokens}/30`], ['Stunt jumps', `${s.stuntJumps}/5`], ['Races won', s.racesWon], ['Cars stolen', s.carsStolen], ['Cops downed', s.copsKilled], ['Distance', `${s.distanceKm.toFixed(1)} km`], ['Top wanted', '★'.repeat(s.maxWanted) || '-']]
       .map(([k, v]) => `<div class="stat-row"><span>${k}</span><b>${v}</b></div>`).join('');
   }
-  function lastSave() {
-    const d = game.save.latest(), sm = summarize(d);
-    return sm ? `<div class="pm-card"><h3>LAST SAVE · ${d.slot === 'auto' ? 'AUTOSAVE' : 'SLOT ' + d.slot}</h3>${sm.title}<br><span style="color:#aaa">${sm.money} · ${sm.time} · ${sm.pct}% complete</span></div>` : '';
-  }
+
 
   function drawMap(c) {
     const g = c.getContext('2d');
@@ -63,7 +67,7 @@ export function createPauseMenu(game) {
     const [sx, sy] = toMap(VIEW.x0, VIEW.z0), src = MAP.px / MAP.size;
     g.drawImage(game.mapImage, sx, sy, VIEW.w * src, VIEW.h * src, 0, 0, c.width, c.height);
     const P = (x, z) => [(x - VIEW.x0) * k, (z - VIEW.z0) * k];
-    drawDistrictLabels(g, P, 34, ['downtown', 'neon', 'palmera', 'heights', 'ironworks', 'midtown', 'marina']);
+    drawDistrictLabels(g, P, 38, ['downtown', 'neon', 'palmera', 'heights', 'ironworks', 'midtown', 'marina']);
     const p = game.player.position;
     const target = game.missions.gpsTarget() || game.waypoint;
     if (target) {
@@ -74,7 +78,7 @@ export function createPauseMenu(game) {
     }
     const zone = game.wanted.searchZone;
     if (zone && game.wanted.level) { const [a, b] = P(zone.x, zone.z); g.beginPath(); g.arc(a, b, zone.r * k, 0, Math.PI * 2); g.fillStyle = 'rgba(255,50,50,0.25)'; g.fill(); g.strokeStyle = '#ff4040'; g.lineWidth = 3; g.stroke(); }
-    for (const b of game.mapBlips()) { const [x, y] = P(b.x, b.z); drawBlip(g, x, y, b.color, b.icon, (b.size || 8) * 2); }
+    for (const b of game.mapBlips()) { const [x, y] = P(b.x, b.z); drawBlip(g, x, y, b.color, b.icon, (b.size || 8) * 2.4); }
     for (const v of game.police.units()) { const [x, y] = P(v.x, v.z); g.beginPath(); g.arc(x, y, 10, 0, Math.PI * 2); g.fillStyle = '#ff3030'; g.fill(); g.lineWidth = 3; g.strokeStyle = '#fff'; g.stroke(); }
     const [px, py] = P(p.x, p.z);
     g.beginPath(); g.arc(px, py, 34, 0, Math.PI * 2); g.fillStyle = 'rgba(255,79,163,0.28)'; g.fill();
@@ -130,11 +134,12 @@ export function createPauseMenu(game) {
     get open() { return !root.classList.contains('hidden'); },
     show(i = 0) {
       root.classList.remove('hidden');
+      game.hud.show(false);
       game.mode = 'paused';
       game.input.releaseLock();
       show(i);
     },
-    close() { root.classList.add('hidden'); game.mode = 'play'; },
+    close() { root.classList.add('hidden'); game.hud.show(true); game.mode = 'play'; },
     nextTab(d) { show((tab + d + TABS.length) % TABS.length); },
   };
   addEventListener('keydown', (e) => {

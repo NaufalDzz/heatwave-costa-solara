@@ -51,12 +51,12 @@ export function drawDistrictLabels(g, project, fontPx, ids = null) {
   g.font = `italic 900 ${fontPx}px Arial Black, Arial, sans-serif`;
   g.textAlign = 'center'; g.textBaseline = 'middle';
   g.lineJoin = 'round';
-  const spots = [['downtown', 0, -125], ['neon', 240, 80], ['palmera', -120, 465], ['heights', -280, 100], ['ironworks', 220, -300], ['midtown', -120, -330], ['marina', 600, -40], ['hills', -560, -560]];
+  const spots = [['downtown', 0, -125], ['neon', 240, 80], ['palmera', -120, 465], ['heights', -280, 100], ['ironworks', 220, -300], ['midtown', -120, -330], ['marina', 596, -40], ['hills', -560, -560]];
   for (const [id, x, z] of spots) {
     if (ids && !ids.includes(id)) continue;
     const [a, b] = project(x, z), name = DISTRICTS[id].name.toUpperCase();
-    g.lineWidth = Math.max(3, fontPx * 0.22); g.strokeStyle = 'rgba(8,10,22,0.9)'; g.strokeText(name, a, b);
-    g.fillStyle = DISTRICTS[id].color; g.fillText(name, a, b);
+    g.lineWidth = Math.max(3, fontPx * 0.22); g.strokeStyle = 'rgba(8,10,22,0.9)'; g.strokeText(name, a, b, fontPx * 7);
+    g.fillStyle = DISTRICTS[id].color; g.fillText(name, a, b, fontPx * 7);
   }
 }
 

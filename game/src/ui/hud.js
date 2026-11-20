@@ -18,7 +18,7 @@ const MARKUP = `
  <div id="heat-row"><em id="heat-tag"></em><span id="heat-note"></span></div><div id="weapon-bar"></div><div id="ammo-line"></div></div>
 <div class="corner mr" id="crew-cards"></div>
 <div class="corner bl" id="radar-stack"><div id="district-plate"><b id="district"></b><span id="street"></span></div>
- <div id="minimap-ring"><canvas id="minimap" width="220" height="220"></canvas></div>
+ <div id="minimap-ring"><canvas id="minimap" width="200" height="200"></canvas></div>
  <div id="vitals"><label>HEALTH</label><div class="bar hp"><i id="hp-fill"></i></div><b id="hp-num"></b><label>ARMOUR</label><div class="bar ar"><i id="ar-fill"></i></div><b id="ar-num"></b></div>
  <div id="rank-row"><span id="rank-badge"></span><div class="rank-mid"><b id="rank-name"></b><div class="bar"><i id="rank-fill"></i></div></div><span id="rank-xp"></span></div></div>
 <section class="corner br panel" id="vehicle-panel"></section>

@@ -156,6 +156,7 @@ export function createPoliceDispatch(game) {
     helicopter,
     officers,
     units: () => units.filter((u) => u.vehicle && !u.vehicle.exploded && !u.vehicle.removed).map((u) => u.vehicle),
+    placeRoadblock,
     spawnUnitNear(x, z, heading) { const u = addCar({ x, z }); u.vehicle.heading = heading; return u; },
     playerSeen() {
       const p = game.player.position;

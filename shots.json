@@ -1,6 +1,6 @@
 [
-  { "name": "1-sunset-chase.jpg", "query": "?shot=chase&seed=1", "caption": "Five-star escape on the Palmera Beach boulevard at sunset: SCPD cruisers ramming, Air-1 helicopter spotlight, a cruiser exploding, story job 10/10, dispatch board, radar, speedometer, radio and dialogue." },
-  { "name": "2-neon-shootout.jpg", "query": "?shot=shootout&seed=1", "caption": "On-foot SMG shootout with Coyote gang collectors in Neon Row: pedestrians fleeing, traffic, a burning car, two stars with a cruiser arriving, weapon slots and the mission objective." },
-  { "name": "3-pause-map.jpg", "query": "?shot=pause&seed=1", "caption": "Pause menu: full city map with GPS route, waypoint and legend, current job, career stats and save slots." },
-  { "name": "4-title.jpg", "query": "?shot=title&seed=1", "caption": "Title screen over a live flyover of Costa Solara with Continue showing the autosave summary." }
+  { "name": "1-beachfront-chase.jpg", "query": "?shot=chase&seed=1", "caption": "Five-star escape down Ocean Mile Blvd at sunset: SCPD cruisers on both doors, Air-1's searchlight, a burning cruiser and a roadblock ahead, job 10/10 with its countdown, the live dispatch board, crew cards, weapon slots, radar and the Vortex GT's speed." },
+  { "name": "2-boardwalk-shootout.jpg", "query": "?shot=shootout&seed=1", "caption": "On foot on the Palmera boardwalk: Santi trades SMG fire with Kroll guards marked by Birdie's EYES UP, a burning car, fleeing crowds, traffic and a cruiser arriving." },
+  { "name": "3-garage.jpg", "query": "?shot=garage&seed=1", "caption": "Wrench Works: the Vortex GT on the turntable with its stat bars, cash, and the car upgrade list with stages, prices and owned rows." },
+  { "name": "4-pause-overview.jpg", "query": "?shot=pause&seed=1", "caption": "Pause overview: the whole city map with district names, legend, waypoint route and player arrow, the ten story jobs, career stats and three save slots." }
 ]

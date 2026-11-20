@@ -32,9 +32,9 @@ void main(){
   float s = max(dot(d, normalize(sunDir)), 0.0);
   vec3 col = mix(horizon, top, pow(clamp(h, 0.0, 1.0), 0.45));
   col = mix(col, horizon * 0.85, smoothstep(0.0, -0.25, h));
-  col += sunColor * (pow(s, 6.0) * 0.45 + pow(s, 64.0) * 0.6) * (1.0 - night * 0.7);
-  float disc = smoothstep(0.9993, 0.9997, s);
-  col = mix(col, vec3(1.0, 0.96, 0.85) * 1.6, disc * (1.0 - night));
+  col += sunColor * (pow(s, 6.0) * 0.5 + pow(s, 64.0) * 0.7 + pow(s, 900.0) * 1.2) * (1.0 - night * 0.7);
+  float disc = smoothstep(0.9982, 0.9988, s);
+  col = mix(col, vec3(1.0, 0.93, 0.75) * 2.2, disc * (1.0 - night));
   if (h > 0.0) {
     vec2 uv = d.xz / (h + 0.12) * 1.4 + vec2(time * 0.004, time * 0.002);
     float c = smoothstep(0.52, 0.78, fbm(uv));
