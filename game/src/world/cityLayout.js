@@ -205,5 +205,17 @@ export function heightAt(x, z) {
   return isLand(x, z) ? 0 : -3;
 }
 
+const AVENUES = ['Cerro Road', 'Heights Ave', 'Jacaranda St', 'Solano Ave', 'Calle Vista', 'Main Street', 'Market St', 'Club Row', 'Azure Ave', 'Neon Strip', 'Harbor Road'];
+const STREETS = ['Hillcrest Dr', '1st Street', '2nd Street', 'Kroll Plaza', 'Union St', 'Central Blvd', 'Palm Street', 'Sunset Ave', 'Coral Way', 'Breeze St', 'Ocean Mile Blvd'];
+/** The name of the street nearest (x, z), or the beach and island names off the grid. */
+export function streetName(x, z) {
+  if (isIsland(x, z) || x > COAST) return 'Marina Azul Docks';
+  if (z > roadCoord(GRID) + 12) return 'Palmera Beach Front';
+  const i = Math.round((x - ORIGIN) / BLOCK), j = Math.round((z - ORIGIN) / BLOCK);
+  const dx = Math.abs(x - roadCoord(i)), dz = Math.abs(z - roadCoord(j));
+  if (i < 0 || j < 0 || i > GRID || j > GRID) return 'Cerro Verde Hills';
+  return dz <= dx ? STREETS[j] : AVENUES[i];
+}
+
 /** A 0..1 hash for deterministic per-thing variation. */
 export const variation = (x, z) => hash2(Math.floor(x * 10), Math.floor(z * 10));

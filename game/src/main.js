@@ -26,7 +26,7 @@ function boot() {
     game.sky.setHour(17.4);
     game.startPlay();
     game.hud.big('COSTA SOLARA', 'Five years gone. The city kept the lights on.', 'passed', 4);
-    game.dialogue.play([['rosa', 'Nico? It is Rosa. Welcome home, mijo. Come see me at Café Rosa in Sunset Heights.'], ['rosa', 'Follow the yellow route on your radar. And try not to steal anything on the way.']]);
+    game.dialogue.play([['ines', 'Santi? It is Inés. Welcome home, cariño. Come see me at Café Inés in Sunset Heights.'], ['ines', 'Follow the yellow route on your radar. And try not to steal anything on the way.']]);
   };
   const title = createTitleScreen(game, {
     onNewGame: newGame,

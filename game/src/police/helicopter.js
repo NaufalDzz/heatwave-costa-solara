@@ -108,7 +108,7 @@ export function createHelicopter(game) {
         if (!wanted && !heli.leaving) heli.leaving = true;
         if (wanted) heli.leaving = false;
         heli.angle += dt * 0.25;
-        const searching = game.wanted.searching && game.wanted.searchZone;
+        const searching = (game.wanted.searching || game.crew?.blackout) && game.wanted.searchZone;
         const cx = searching ? game.wanted.searchZone.x : p.x, cz = searching ? game.wanted.searchZone.z : p.z;
         let tx = cx + Math.cos(heli.angle) * 34, tz = cz + Math.sin(heli.angle) * 34, ty = 40;
         if (heli.leaving) { tx = heli.x + Math.sin(heli.heading) * 100; tz = heli.z + Math.cos(heli.heading) * 100; ty = 80; }
@@ -120,7 +120,7 @@ export function createHelicopter(game) {
         heli.aimX = damp(heli.aimX, p.x + Math.sin(game.time * 0.9) * sweep, searching ? 0.8 : 3, dt);
         heli.aimZ = damp(heli.aimZ, p.z + Math.cos(game.time * 0.7) * sweep, searching ? 0.8 : 3, dt);
         if (heli.leaving && Math.hypot(heli.x - p.x, heli.z - p.z) > 260) heli.dismiss(true);
-        heli.spotting = heli.seesPlayer();
+        heli.spotting = !game.crew?.blackout && heli.seesPlayer();
         heli.shootTimer -= dt;
         if (game.wanted.level >= 5 && heli.shootTimer <= 0 && heli.spotting && game.player.hero.alive) {
           heli.shootTimer = 1.6 + game.rng.next();
@@ -145,9 +145,9 @@ export function createHelicopter(game) {
         beam.position.set(heli.x, heli.y - 1.6, heli.z);
         beam.scale.set(1, len, 1);
         beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), look.normalize());
-        beamMat.opacity = 0.025 + night * 0.06;
+        beamMat.opacity = 0.07 + night * 0.06;
         pool.position.set(heli.aimX, 0.12, heli.aimZ);
-        pool.material.opacity = 0.06 + night * 0.18;
+        pool.material.opacity = 0.16 + night * 0.14;
       }
     },
   };

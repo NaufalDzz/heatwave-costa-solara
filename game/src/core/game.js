@@ -1,29 +1,32 @@
-// Assembles Costa Solara: the renderer, scene and camera, then every system in the order they
-// depend on each other, and runs one simulation tick (fixed 1/60 s) and one rendered frame.
+// Assembles Costa Solara: the renderer, scene and camera, then every system (story, crew, garage,
+// police, vehicles, AI, UI, world) in the order they depend on each other,
+// and runs one simulation tick (fixed 1/60 s) and one rendered frame.
 import * as THREE from 'three';
-import { createWantedSystem } from '../police/wantedSystem.js';
-import { createPoliceDispatch } from '../police/policeDispatch.js';
 import { createMissionRunner } from '../missions/missionRunner.js';
 import { createActivities } from '../missions/sideActivities.js';
+import { createCrew } from '../crew/crewAbilities.js';
+import { createGarageShop } from '../shops/garageShop.js';
+import { createWantedSystem } from '../police/wantedSystem.js';
+import { createPoliceDispatch } from '../police/policeDispatch.js';
 import { createEconomy } from '../progression/economy.js';
+import { createVehicleManager } from '../vehicles/vehicleManager.js';
+import { createWeapons } from '../combat/weapons.js';
 import { createTraffic } from '../ai/traffic.js';
 import { createPedestrians } from '../ai/pedestrians.js';
+import { createPlayer } from '../player/playerController.js';
+import { createCameraRig } from '../player/cameraRig.js';
 import { createHud } from '../ui/hud.js';
 import { createMinimap } from '../ui/minimap.js';
 import { renderCityMap } from '../ui/mapRenderer.js';
 import { createPauseMenu } from '../ui/pauseMenu.js';
-import { createShopMenu } from '../ui/shopMenu.js';
-import { createSaveSystem } from '../save/saveSystem.js';
+import { createGarageScreen } from '../ui/garageScreen.js';
 import { createDialogue } from '../ui/dialogue.js';
+import { createSaveSystem } from '../save/saveSystem.js';
 import { createSoundEffects } from '../audio/soundEffects.js';
 import { createRadio } from '../audio/radio.js';
 import { createRng } from './rng.js';
 import { createEvents } from './events.js';
 import { createInput } from './input.js';
-import { createPlayer } from '../player/playerController.js';
-import { createCameraRig } from '../player/cameraRig.js';
-import { createWeapons } from '../combat/weapons.js';
-import { createVehicleManager } from '../vehicles/vehicleManager.js';
 import { createParticles } from '../fx/particles.js';
 import { createBloomPass } from '../fx/bloomPass.js';
 import { createEffects } from '../fx/effects.js';
@@ -82,9 +85,11 @@ export function createGame(canvas, seed = 1) {
   game.dialogue = createDialogue(game);
   game.activities = createActivities(game);
   game.missions = createMissionRunner(game);
+  game.crew = createCrew(game);
+  game.garageShop = createGarageShop(game);
   game.save = createSaveSystem(game);
   game.pauseMenu = createPauseMenu(game);
-  game.shop = createShopMenu(game);
+  game.shop = createGarageScreen(game);
   game.extraBlips = () => [...game.activities.blips(), ...game.missions.blips()];
 
   let humanoidCache = [];
@@ -118,6 +123,7 @@ export function createGame(canvas, seed = 1) {
     game.player.controlsLocked = false;
     game.wanted.clear();
     game.police.reset();
+    game.crew.reset();
     if (busted) {
       game.economy.addMoney(-500);
       const inv = game.weapons.inv;
@@ -140,6 +146,7 @@ export function createGame(canvas, seed = 1) {
       game.missions.update(dt);
       game.activities.update(dt);
       game.shop.update(dt);
+      game.crew.update(dt);
       game.radio.update(dt);
       game.wanted.update(dt);
       game.economy.stats.playSeconds += dt;
@@ -177,7 +184,8 @@ export function createGame(canvas, seed = 1) {
     if (game.mode === 'play' || game.mode === 'shot') { game.hud.update(dt); game.minimap.update(dt); contextHelp(); }
     game.audio.update();
     glowScale.value = renderer.domElement.height / 2 / Math.tan((camera.fov * Math.PI) / 360);
-    bloom.render(scene, camera);
+    if (game.shop.open) game.shop.render(dt);
+    else bloom.render(scene, camera);
   };
 
   function contextHelp() {

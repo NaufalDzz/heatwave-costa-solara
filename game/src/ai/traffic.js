@@ -21,6 +21,8 @@ export function createTraffic(game) {
       const seg = lanePoint(a, b, t.lane, 0);
       // Progress along the edge.
       const along = ((veh.x - a.x) * seg.dirX + (veh.z - a.z) * seg.dirZ) / seg.len;
+      // Static's BLACKOUT: the signals are dead, so drivers near the player stop short of junctions.
+      if (game.crew?.blackout && along > 0.8 && Math.hypot(veh.x - game.player.position.x, veh.z - game.player.position.z) < 180) return { throttle: 0, steer: 0, handbrake: true };
       if (along > 1 - 9 / seg.len) {
         const options = b.links.filter((id) => id !== t.from);
         t.from = t.to;

@@ -49,6 +49,14 @@ export function createVehicleManager(game) {
       mgr.sync(v);
       return v;
     },
+    /** A fresh coat of paint: rebuild the body mesh in the new colour. */
+    repaint(v, color) {
+      scene.remove(v.parts.root);
+      v.parts = buildVehicleMesh(v.type, color);
+      v.color = color;
+      scene.add(v.parts.root);
+      mgr.sync(v);
+    },
     remove(v) {
       const i = list.indexOf(v);
       if (i >= 0) list.splice(i, 1);
@@ -84,7 +92,7 @@ export function createVehicleManager(game) {
     },
     damage(v, amount, byPlayer) {
       if (v.exploded) return;
-      v.condition -= amount / (v.spec.armor || 1);
+      v.condition -= amount / ((v.spec.armor || 1) * (1 + 0.35 * (v.upgrades?.armor || 0)));
       if (byPlayer) v.lastHitByPlayer = game.time;
     },
     explode(v) {

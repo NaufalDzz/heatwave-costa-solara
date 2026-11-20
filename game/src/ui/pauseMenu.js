@@ -84,7 +84,7 @@ export function createPauseMenu(game) {
   function storyTab() {
     const done = game.missions.done, idx = game.missions.index;
     const rows = STORY.map((m, i) => `<div class="mission-row"><span class="st ${i < idx ? 'done' : i === idx ? 'active' : 'locked'}">${i < idx ? 'DONE' : i === idx ? 'NEXT' : 'LOCKED'}</span><b>${i + 1}. ${m.title}</b><span style="color:#aaa;margin-left:auto">${CAST[m.giver].name}</span></div>`).join('');
-    const cast = ['nico', 'rosa', 'wrench', 'lexi', 'dante', 'hale'].map((id) => `<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px"><canvas data-who="${id}" width="64" height="64" style="border-radius:6px;border:2px solid #ffcf4a"></canvas><div><b>${CAST[id].name}</b><br><span style="color:#bbb;font-size:13px">${CAST[id].role}</span></div></div>`).join('');
+    const cast = ['santi', 'ines', 'wrench', 'lexi', 'dante', 'hale'].map((id) => `<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px"><canvas data-who="${id}" width="64" height="64" style="border-radius:6px;border:2px solid #ffcf4a"></canvas><div><b>${CAST[id].name}</b><br><span style="color:#bbb;font-size:13px">${CAST[id].role}</span></div></div>`).join('');
     body.innerHTML = `<div class="pm-col"><div class="pm-card"><h3>STORY · ${done.length}/${STORY.length} JOBS</h3>${rows}</div></div><div class="pm-col"><div class="pm-card"><h3>THE CAST</h3>${cast}</div></div>`;
     body.querySelectorAll('canvas[data-who]').forEach((c) => drawPortrait(c.getContext('2d'), c.dataset.who, 64));
   }

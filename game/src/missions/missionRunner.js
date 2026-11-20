@@ -110,6 +110,7 @@ export function createMissionRunner(game) {
       ctx.target = { x: d.x + 2.5, z: d.z + 2.5 };
     } else if (s.type === 'escape') {
       game.wanted.setLevel(Math.max(game.wanted.level, s.level));
+      if (s.seconds) ctx.timeLeft = s.seconds;
     } else if (s.type === 'timed') {
       ctx.point = 0; ctx.timeLeft = s.seconds; ctx.vehicle = tagged[s.tag];
       placeCheckpoint();
@@ -159,7 +160,8 @@ export function createMissionRunner(game) {
         }
         const live = ctx.enemies.find((h) => h.alive);
         if (live) { ctx.target = { x: live.x, z: live.z }; }
-        ctx.extra = `Targets left: <b>${alive}</b>` + (boss ? `<div class="bar"><i style="width:${Math.max(0, (boss.health / 260) * 100)}%"></i></div>Dante Kroll` : '');
+        ctx.objective = `${s.text} <b class="count">${ctx.enemies.length - alive}/${ctx.enemies.length} down</b>`;
+        ctx.extra = (boss ? `<div class="bar"><i style="width:${Math.max(0, (boss.health / 260) * 100)}%"></i></div>Dante Kroll` : '');
         return alive === 0;
       }
       case 'chase': {
@@ -178,6 +180,7 @@ export function createMissionRunner(game) {
         if (near(ctx.target.x, ctx.target.z, pv ? 4 : 2.2)) { game.audio?.cash(); return true; }
         return false;
       case 'escape':
+        if (s.seconds && (ctx.timeLeft -= dt) <= 0) return fail(s.failText || 'Out of time');
         ctx.objective = game.wanted.level > 0 ? s.text : 'Clear';
         ctx.target = null;
         return ctx.t > 1 && game.wanted.level === 0;
@@ -259,16 +262,17 @@ export function createMissionRunner(game) {
       if (st.active && ctx && checkStage(dt) === true && st.active) nextStage();
     },
     hudInfo() {
+      const giver = (id) => `${CAST[id].name.replace(/".*" /, '')} · ${CAST[id].tag}`;
       if (st.active) {
-        const s = ctx?.s;
-        const t = ctx?.timeLeft;
-        return { tag: `STORY · JOB ${st.index + 1}/${STORY.length}`, title: st.active.title, stages: st.active.stages, stage: Math.max(0, st.stage), objective: ctx ? ctx.objective : `Talk to ${CAST[st.active.giver].name}`, timer: s?.type === 'timed' ? `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}` : '', extra: ctx?.extra || '' };
+        const m = st.active, s = ctx?.s, t = ctx?.timeLeft;
+        const next = m.stages[st.stage + 1];
+        return { tag: `JOB ${st.index + 1}/${STORY.length}`, title: m.title, giver: giver(m.giver), stages: m.stages.length, stage: Math.max(0, st.stage), objective: ctx ? ctx.objective : `Talk to ${CAST[m.giver].name}`, next: next ? next.text : `Payday: ${formatMoney(m.reward.money)} · +${m.reward.respect} respect`, timer: t > 0 ? `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}` : '', extra: ctx?.extra || '' };
       }
       const act = game.activities?.hudInfo();
       if (act) return act;
       const m = STORY[st.index];
-      if (!m) return { tag: 'FREE ROAM', title: 'Costa Solara', stages: [], stage: 0, objective: 'Races, taxi fares, stunt jumps and Sun Tokens await', extra: '' };
-      return { tag: `STORY · NEXT JOB ${st.index + 1}/${STORY.length}`, title: m.title, stages: m.stages, stage: -1, objective: `Meet ${CAST[m.giver].name} (yellow marker)`, extra: m.blurb };
+      if (!m) return { tag: 'FREE ROAM', title: 'Costa Solara', stages: 0, stage: 0, objective: 'Races, taxi fares, stunt jumps and Sun Tokens await', extra: '' };
+      return { tag: `JOB ${st.index + 1}/${STORY.length}`, title: m.title, giver: giver(m.giver), stages: m.stages.length, stage: -1, objective: `Meet ${CAST[m.giver].name} at the yellow marker`, next: m.blurb, extra: '' };
     },
     gpsTarget() {
       if (st.active) return ctx?.target || null;

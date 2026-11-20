@@ -1,4 +1,4 @@
-// The hero, Nico Reyes: walking, sprinting with stamina, jumping, swimming, punching and
+// The hero, Santi Ocampo: walking, sprinting with stamina, jumping, swimming, punching and
 // shooting on foot; stealing a car (the driver is dragged out and runs) and driving it with
 // throttle, steering, handbrake drifts, nitro and horn; getting out; health and armour.
 import { Humanoid } from '../characters/humanoid.js';
@@ -24,6 +24,7 @@ export function createPlayer(game, x, z) {
     },
     enterVehicle(v) {
       p.vehicle = v;
+      p.lastVehicle = v;
       hero.inVehicle = v;
       v.driver = 'player';
       v.controller = null;

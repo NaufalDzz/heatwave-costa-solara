@@ -22,13 +22,13 @@ export function stepVehicle(v, input, dt, collision) {
   if (!v.airborne) {
     if (throttle > 0) {
       if (vF < -0.5) vF += s.accel * 2.2 * throttle * dt;
-      else vF += s.accel * (input.nitro ? 1.7 : 1) * throttle * dt * clamp(1 - vF / top, 0, 1);
+      else vF += s.accel * (1 + (v.upgrades?.engine || 0) * 0.1) * (input.nitro ? 1.7 : 1) * throttle * dt * clamp(1 - vF / top, 0, 1);
     } else if (throttle < 0) {
       if (vF > 0.5) vF -= 30 * -throttle * dt;
       else vF = Math.max(-top * 0.3, vF + s.accel * 0.7 * throttle * dt);
     } else vF = damp(vF, 0, 0.35, dt);
     vF -= vF * Math.abs(vF) * 0.0006 * dt;
-    const grip = s.grip * (input.handbrake ? 0.16 : 1) * (Math.abs(vR) > 6 ? 0.7 : 1);
+    const grip = s.grip * (1 + (v.upgrades?.tyres || 0) * 0.12) * (input.handbrake ? 0.16 : 1) * (Math.abs(vR) > 6 ? 0.7 : 1);
     vR = damp(vR, 0, grip, dt);
     if (input.handbrake) vF = damp(vF, 0, 0.9, dt);
     const speedFactor = clamp(Math.abs(vF) / 5, 0, 1) / (1 + Math.abs(vF) / 40);

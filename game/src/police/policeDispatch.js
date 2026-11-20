@@ -1,7 +1,7 @@
-// SCPD response to the wanted level: cruisers dispatched along the roads that chase and ram,
-// officers (SWAT at five stars) who bail out and shoot, roadblocks across the player's path from
-// three stars, the Air-1 helicopter from four, the dispatch board rows, line-of-sight checks and
-// getting busted.
+// SCPD response to the wanted level: cruisers dispatched along the roads that chase, flank and
+// ram, shoot from the window at four stars, officers (SWAT at five) who bail out and fire,
+// roadblocks across the player's path from three stars, the Air-1 helicopter from four, the
+// dispatch board rows with each unit's live status, line-of-sight checks and getting busted.
 import { Humanoid } from '../characters/humanoid.js';
 import { OUTFITS } from '../characters/humanoidModel.js';
 import { steerToward, routeTarget } from '../ai/driving.js';
@@ -10,6 +10,7 @@ import { createHelicopter } from './helicopter.js';
 import { nearestNode } from '../ai/roadGraph.js';
 
 const CARS_BY_LEVEL = [0, 2, 3, 4, 5, 6];
+const CALLSIGNS = ['VIPER', 'COMET', 'RAZOR', 'HALO', 'EMBER', 'BOLT', 'ONYX', 'SABLE'];
 
 export function createPoliceDispatch(game) {
   const units = []; // { id, callsign, vehicle, officers: [], status, roadblock }
@@ -39,7 +40,7 @@ export function createPoliceDispatch(game) {
     const v = game.vehicles.spawn(opts.type || 'police', node.x + (game.rng.next() - 0.5) * 4, node.z + (game.rng.next() - 0.5) * 4, heading, { driver: 'cop' });
     v.siren = true;
     v.condition = 100;
-    const unit = { id: callsign, callsign: `UNIT ${callsign++}`, vehicle: v, officers: [], status: 'EN ROUTE', kind: v.spec.name.replace('SCPD ', ''), roadblock: !!opts.roadblock };
+    const unit = { id: callsign, callsign: `${CALLSIGNS[callsign % CALLSIGNS.length]}-${callsign++}`, vehicle: v, officers: [], status: 'EN ROUTE', kind: v.spec.name.replace('SCPD ', ''), roadblock: !!opts.roadblock };
     v.unit = unit;
     v.controller = (veh, dt) => driveUnit(unit, veh, dt);
     units.push(unit);
@@ -62,10 +63,33 @@ export function createPoliceDispatch(game) {
     unit.deployed = true;
   }
 
+  /** At four stars the passenger leans out and fires at a car alongside or ahead. */
+  function windowFire(unit, v, d, dt) {
+    unit.fireTimer = (unit.fireTimer ?? 1 + game.rng.next()) - dt;
+    if (game.wanted.level < 4 || d > 30 || unit.fireTimer > 0) return;
+    unit.fireTimer = 0.9 + game.rng.next() * 0.8;
+    const p = game.player.position;
+    if (!game.collision.lineOfSight(v.x, v.y + 1.4, v.z, p.x, p.y + 1, p.z)) return;
+    const ox = v.x + Math.cos(v.heading) * 1.1, oy = v.y + 1.45, oz = v.z - Math.sin(v.heading) * 1.1;
+    let dx = p.x - ox, dy = p.y + 0.9 - oy, dz = p.z - oz;
+    const l = Math.hypot(dx, dy, dz); dx /= l; dy /= l; dz /= l;
+    game.weapons.fire({ x: ox, y: oy, z: oz, kind: 'cop', inVehicle: v }, { x: ox + dx * 1.5, y: oy + dy * 1.5, z: oz + dz * 1.5 }, { x: dx, y: dy, z: dz }, { id: 'smg', damage: 9, range: 60, spread: 0.05 }, { muzzle: [ox, oy, oz], damageScale: 0.4, friendly: true });
+    unit.firing = game.time;
+  }
+
   function driveUnit(unit, v, dt) {
     if (v.condition <= 0) { unit.status = 'DOWN'; return null; }
     if (unit.roadblock) { unit.status = 'ROADBLOCK'; return { throttle: 0, steer: 0, handbrake: true }; }
-    if (unit.deployed) return { throttle: 0, steer: 0, handbrake: true };
+    if (unit.deployed) {
+      const p = game.player.position;
+      unit.status = unit.officers.some((h) => h.alive && Math.hypot(h.x - p.x, h.z - p.z) < 24) && game.wanted.level >= 2 ? 'FIRING' : 'ON FOOT';
+      return { throttle: 0, steer: 0, handbrake: true };
+    }
+    if (game.crew?.blackout && game.wanted.level > 0) {
+      unit.status = 'SCRAMBLED';
+      const t = routeTarget(game, v, v.x + Math.sin(v.heading + unit.id) * 200, v.z + Math.cos(v.heading + unit.id) * 200);
+      return steerToward(game, v, t.x, t.z, 12, dt);
+    }
     const p = game.player.position;
     const d = Math.hypot(p.x - v.x, p.z - v.z);
     if (game.wanted.level === 0) {
@@ -89,7 +113,11 @@ export function createPoliceDispatch(game) {
     // Close pursuit: aim a little ahead of a moving car to cut it off and ram.
     const lead = pv ? Math.min(d / 25, 1.2) : 0;
     const tx = p.x + (pv ? pv.vx * lead : 0), tz = p.z + (pv ? pv.vz * lead : 0);
-    unit.status = pv && d < 30 && game.wanted.level >= 2 ? 'RAMMING' : 'PURSUIT';
+    // Alongside the player's car (beside it rather than behind) counts as flanking.
+    const along = pv ? ((v.x - pv.x) * Math.sin(pv.heading) + (v.z - pv.z) * Math.cos(pv.heading)) : 0;
+    const beside = pv ? Math.abs((v.x - pv.x) * Math.cos(pv.heading) - (v.z - pv.z) * Math.sin(pv.heading)) : 0;
+    windowFire(unit, v, d, dt);
+    unit.status = game.time - (unit.firing ?? -9) < 0.8 ? 'FIRING' : pv && d < 14 && beside > 2.2 && along > -5 ? 'FLANKING' : pv && d < 30 && game.wanted.level >= 2 ? 'RAMMING' : 'PURSUIT';
     return steerToward(game, v, tx, tz, pv ? 40 : 12, dt, { avoidCars: false, drift: true, arrive: !pv, ignore: pv });
   }
 
@@ -149,8 +177,8 @@ export function createPoliceDispatch(game) {
     },
     dispatchRows() {
       const p = game.player.position;
-      const rows = units.filter((u) => u.vehicle && !u.vehicle.removed).map((u) => ({ callsign: u.callsign, kind: u.officers.length && u.deployed ? 'Officers' : u.kind, dist: Math.round(Math.hypot(u.vehicle.x - p.x, u.vehicle.z - p.z)), status: u.vehicle.exploded ? 'DOWN' : u.status }));
-      if (helicopter.active) rows.unshift({ callsign: 'AIR-1', kind: 'Sparrow Heli', dist: Math.round(Math.hypot(helicopter.x - p.x, helicopter.z - p.z)), status: helicopter.spotting ? 'SPOTLIGHT' : 'SEARCHING' });
+      const rows = units.filter((u) => u.vehicle && !u.vehicle.removed).map((u) => ({ callsign: u.callsign, kind: u.officers.length && u.deployed ? 'Officers' : u.kind, icon: u.deployed ? 'foot' : 'car', dist: Math.round(Math.hypot(u.vehicle.x - p.x, u.vehicle.z - p.z)), status: u.vehicle.exploded ? 'DOWN' : u.status }));
+      if (helicopter.active) rows.push({ callsign: 'AIR-1', kind: 'Sparrow Heli', icon: 'heli', dist: Math.round(Math.hypot(helicopter.x - p.x, helicopter.z - p.z)), status: game.crew?.blackout ? 'SCRAMBLED' : helicopter.spotting ? 'SPOTLIGHT' : 'SEARCHING' });
       return rows.sort((a, b) => (a.status === 'DOWN') - (b.status === 'DOWN') || a.dist - b.dist);
     },
     allHumanoids: () => officers,

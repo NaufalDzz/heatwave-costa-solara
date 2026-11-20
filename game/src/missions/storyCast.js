@@ -1,13 +1,15 @@
 // The original cast of HEATWAVE and how each face is drawn: skin, hair, clothing, accessories
 // and backdrop for the procedural dialogue portraits.
 export const CAST = {
-  nico: { name: 'Nico Reyes', role: 'You. Back in Costa Solara after five years away.', skin: '#c68863', hair: 'short', hairColor: '#1b1b1b', shirt: '#17b3a8', bg: ['#1a5c6b', '#2fe6d8'], extra: ['stubble'] },
-  rosa: { name: 'Tía Rosa Vega', role: 'Mentor. Runs Café Rosa and half of Sunset Heights.', skin: '#d9a07a', hair: 'bun', hairColor: '#cfcfcf', shirt: '#b5179e', bg: ['#7a2a12', '#ff9f43'], extra: ['earrings', 'lipstick'] },
-  wrench: { name: 'Jojo "Wrench" Okafor', role: 'Crew. Mechanic at Wrench Works, never met an engine he could not wake.', skin: '#6b4430', hair: 'cap', hairColor: '#2b2b2b', capColor: '#ff7b00', shirt: '#264653', bg: ['#103a3a', '#2a9d8f'], extra: ['goggles', 'beard'] },
-  lexi: { name: 'Lexi Moon', role: 'Crew. Getaway driver and hacker from Neon Row.', skin: '#f1c7a5', hair: 'long', hairColor: '#ff4fa3', shirt: '#1d1d24', bg: ['#2a0a3a', '#c77dff'], extra: ['lipstick', 'piercing'] },
-  dante: { name: 'Dante Kroll', role: 'Rival. Developer, landlord and owner of the Kroll Syndicate.', skin: '#e8b48f', hair: 'slick', hairColor: '#3b2416', shirt: '#4b1d6e', bg: ['#14051f', '#6a1b9a'], extra: ['shades', 'tie'] },
-  hale: { name: 'Capt. Marcus Hale', role: 'SCPD captain who sells protection to the highest bidder.', skin: '#a86b4a', hair: 'cop', hairColor: '#222', shirt: '#22325a', bg: ['#0b1838', '#3d6bff'], extra: ['mustache'] },
-  dispatch: { name: 'SCPD Dispatch', role: 'Police radio.', skin: '#888', hair: 'radio', hairColor: '#222', shirt: '#22325a', bg: ['#0b1020', '#335'], extra: [] },
+  santi: { tag: 'YOU', name: 'Santi Ocampo', role: 'You. Back in Costa Solara after five years away.', skin: '#c68863', hair: 'short', hairColor: '#1b1b1b', shirt: '#17b3a8', bg: ['#1a5c6b', '#2fe6d8'], extra: ['stubble'] },
+  ines: { tag: 'MENTOR · CAFÉ INÉS', name: 'Inés Duarte', role: 'Mentor. Runs Café Inés and half of Sunset Heights.', skin: '#d9a07a', hair: 'bun', hairColor: '#cfcfcf', shirt: '#b5179e', bg: ['#7a2a12', '#ff9f43'], extra: ['earrings', 'lipstick'] },
+  wrench: { tag: 'CREW · MECHANIC', name: 'Jojo "Wrench" Okafor', role: 'Crew. Mechanic at Wrench Works, never met an engine he could not wake.', skin: '#6b4430', hair: 'cap', hairColor: '#2b2b2b', capColor: '#ff7b00', shirt: '#264653', bg: ['#103a3a', '#2a9d8f'], extra: ['goggles', 'beard'] },
+  lexi: { tag: 'CREW · GETAWAY DRIVER', name: 'Lexi Moon', role: 'Crew. Getaway driver from Neon Row who knows every back alley.', skin: '#f1c7a5', hair: 'long', hairColor: '#ff4fa3', shirt: '#1d1d24', bg: ['#2a0a3a', '#c77dff'], extra: ['lipstick', 'piercing'] },
+  dante: { tag: 'RIVAL · KROLL SYNDICATE', name: 'Dante Kroll', role: 'Rival. Developer, landlord and owner of the Kroll Syndicate.', skin: '#e8b48f', hair: 'slick', hairColor: '#3b2416', shirt: '#4b1d6e', bg: ['#14051f', '#6a1b9a'], extra: ['shades', 'tie'] },
+  hale: { tag: 'SCPD CAPTAIN', name: 'Capt. Marcus Hale', role: 'SCPD captain who sells protection to the highest bidder.', skin: '#a86b4a', hair: 'cop', hairColor: '#222', shirt: '#22325a', bg: ['#0b1838', '#3d6bff'], extra: ['mustache'] },
+  static: { tag: 'CREW · HACKER', name: 'Ravi "Static" Anand', role: 'Crew. Hacker who lives in the city\'s traffic grid.', skin: '#9c6a48', hair: 'short', hairColor: '#101010', shirt: '#2b2d42', bg: ['#08243a', '#00b4d8'], extra: ['headset', 'glasses'] },
+  birdie: { tag: 'CREW · LOOKOUT', name: 'Birdie Kalani', role: 'Crew. Rooftop lookout with a long lens and a longer memory.', skin: '#b07a55', hair: 'buns', hairColor: '#2a1a10', shirt: '#f4a261', bg: ['#3a2a05', '#ffd166'], extra: ['earrings'] },
+  dispatch: { tag: 'POLICE RADIO', name: 'SCPD Dispatch', role: 'Police radio.', skin: '#888', hair: 'radio', hairColor: '#222', shirt: '#22325a', bg: ['#0b1020', '#335'], extra: [] },
 };
 
 /** Paint the portrait of a cast member into a 2D context of size S. */
@@ -44,6 +46,7 @@ export function drawPortrait(g, id, S = 120) {
   if (c.hair === 'short' || c.hair === 'cop') { g.beginPath(); g.ellipse(60, 32, 25, 14, 0, Math.PI, 0); g.fill(); g.fillRect(35, 30, 50, 7); }
   if (c.hair === 'bun') { g.beginPath(); g.ellipse(60, 31, 25, 13, 0, Math.PI, 0); g.fill(); g.beginPath(); g.arc(60, 16, 11, 0, Math.PI * 2); g.fill(); }
   if (c.hair === 'long') { g.beginPath(); g.ellipse(60, 30, 26, 14, 0, Math.PI, 0); g.fill(); g.fillRect(34, 30, 10, 40); g.fillRect(76, 30, 10, 40); }
+  if (c.hair === 'buns') { g.beginPath(); g.ellipse(60, 31, 25, 13, 0, Math.PI, 0); g.fill(); g.beginPath(); g.arc(38, 22, 10, 0, Math.PI * 2); g.arc(82, 22, 10, 0, Math.PI * 2); g.fill(); }
   if (c.hair === 'slick') { g.beginPath(); g.ellipse(58, 30, 26, 13, -0.15, Math.PI, 0); g.fill(); g.fillRect(36, 28, 48, 6); }
   if (c.hair === 'cap') { g.fillStyle = c.capColor; g.beginPath(); g.ellipse(60, 30, 27, 15, 0, Math.PI, 0); g.fill(); g.fillRect(56, 30, 40, 6); }
   if (c.hair === 'cop') { g.fillStyle = '#14213d'; g.fillRect(32, 18, 56, 12); g.fillStyle = '#0d1428'; g.fillRect(30, 28, 62, 5); g.fillStyle = '#e0c050'; g.fillRect(56, 20, 8, 7); }
@@ -55,6 +58,8 @@ export function drawPortrait(g, id, S = 120) {
     g.fillStyle = '#2b1a10'; g.fillRect(48, 47, 4, 5); g.fillRect(69, 47, 4, 5);
     g.fillStyle = c.hairColor; g.fillRect(43, 41, 13, 3); g.fillRect(64, 41, 13, 3);
   }
+  if (c.extra.includes('glasses')) { g.strokeStyle = '#111'; g.lineWidth = 3; g.strokeRect(42, 43, 15, 11); g.strokeRect(63, 43, 15, 11); g.fillRect(57, 47, 6, 2); }
+  if (c.extra.includes('headset')) { g.fillStyle = '#222'; g.fillRect(31, 26, 58, 5); g.fillRect(28, 44, 8, 18); g.fillRect(84, 44, 8, 18); g.fillStyle = '#00e5ff'; g.fillRect(84, 60, 4, 12); g.fillRect(70, 70, 16, 3); }
   if (c.extra.includes('goggles')) { g.fillStyle = '#ffb703'; g.fillRect(36, 24, 48, 6); g.fillStyle = '#9ad1ff'; g.beginPath(); g.arc(48, 27, 6, 0, Math.PI * 2); g.arc(72, 27, 6, 0, Math.PI * 2); g.fill(); }
   g.fillStyle = 'rgba(0,0,0,0.25)'; g.fillRect(58, 52, 4, 10);
   g.fillStyle = c.extra.includes('lipstick') ? '#c9184a' : '#7a3b2e';

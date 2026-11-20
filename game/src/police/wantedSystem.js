@@ -8,7 +8,7 @@ const THRESHOLDS = [0, 1, 260, 700, 1400, 2600];
 
 export function createWantedSystem(game) {
   const w = {
-    level: 0, heat: 0, searching: false, unseen: 0, outside: 0, searchZone: null, locked: false, lastCrime: -99,
+    level: 0, heat: 0, searching: false, unseen: 0, outside: 0, searchZone: null, locked: false, lastCrime: -99, blindUntil: -1,
     clear() { w.level = 0; w.heat = 0; w.searching = false; w.searchZone = null; game.events.emit('wantedCleared'); },
     setLevel(n) {
       const before = w.level;
@@ -19,6 +19,15 @@ export function createWantedSystem(game) {
       const p = game.player.position;
       w.searchZone = { x: p.x, z: p.z, r: 80 + w.level * 40 };
       w.unseen = 0; w.searching = false;
+    },
+    /** Lexi's CLEAN BREAK: one star less, and the search moves to a false trail 160 m away. */
+    dropStar() {
+      const lvl = w.level - 1;
+      if (lvl <= 0) { w.clear(); game.hud.notify('You lost the cops', '#2fe6d8'); return; }
+      const p = game.player.position, a = game.rng.next() * Math.PI * 2;
+      w.level = lvl; w.heat = THRESHOLDS[lvl];
+      w.searchZone = { x: p.x + Math.cos(a) * 160, z: p.z + Math.sin(a) * 160, r: 80 + lvl * 40 };
+      w.searching = true; w.unseen = 4; w.outside = 0; w.blindUntil = game.time + 8;
     },
     /** Report a crime: min is the least level it brings, heat adds escalation. */
     crime(min, heat) {
@@ -33,7 +42,7 @@ export function createWantedSystem(game) {
     update(dt) {
       if (w.level === 0) return;
       const p = game.player.position;
-      const seen = game.police.playerSeen();
+      const seen = !game.crew?.blackout && game.time > w.blindUntil && game.police.playerSeen();
       if (seen) {
         w.unseen = 0; w.searching = false; w.outside = 0;
         w.searchZone = { x: p.x, z: p.z, r: 80 + w.level * 40 };

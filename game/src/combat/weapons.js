@@ -1,4 +1,4 @@
-// Weapons and gunfire: the five weapon slots (fists, pistol, SMG, shotgun, carbine) with clip,
+// Weapons and gunfire: six slots (fists, pistol, SMG, shotgun, carbine, rocket launcher) with clip,
 // reserve ammo, fire rate, spread and reload; hitscan shots against people, cars and buildings
 // with tracers, muzzle flash and impacts; punches; drive-by shooting from a car; and the same
 // fire() used by police and gang AI.
@@ -6,16 +6,17 @@ import { clamp } from '../core/mathUtils.js';
 
 export const WEAPONS = [
   { id: 'fists', name: 'Fists', slot: 1, melee: true, damage: 18, rate: 0.42, range: 1.7 },
-  { id: 'pistol', name: 'P9 Compact', slot: 2, damage: 30, rate: 0.26, clip: 15, spread: 0.012, range: 140, price: 600, ammoPrice: 80 },
-  { id: 'smg', name: 'Hornet SMG', slot: 3, damage: 19, rate: 0.085, clip: 30, spread: 0.035, range: 110, auto: true, price: 2500, ammoPrice: 150 },
-  { id: 'shotgun', name: 'Breaker 12', slot: 4, damage: 14, pellets: 8, rate: 0.85, clip: 6, spread: 0.075, range: 45, price: 3500, ammoPrice: 120 },
-  { id: 'rifle', name: 'Coastline Carbine', slot: 5, damage: 36, rate: 0.12, clip: 30, spread: 0.014, range: 220, auto: true, price: 6000, ammoPrice: 200 },
+  { id: 'pistol', name: 'P9 Compact', short: 'P9', slot: 2, damage: 30, rate: 0.26, clip: 15, spread: 0.012, range: 140, price: 600, ammoPrice: 80, rank: 1 },
+  { id: 'smg', name: 'Hornet SMG', short: 'HORNET', slot: 3, damage: 19, rate: 0.085, clip: 30, spread: 0.035, range: 110, auto: true, price: 2500, ammoPrice: 150, rank: 2 },
+  { id: 'shotgun', name: 'Breaker 12', short: 'BREAKER', slot: 4, damage: 14, pellets: 8, rate: 0.85, clip: 6, spread: 0.075, range: 45, price: 3500, ammoPrice: 120, rank: 3 },
+  { id: 'rifle', name: 'Coastline Carbine', short: 'CARBINE', slot: 5, damage: 36, rate: 0.12, clip: 30, spread: 0.014, range: 220, auto: true, price: 6000, ammoPrice: 200, rank: 4 },
+  { id: 'launcher', name: 'Riptide Launcher', short: 'RIPTIDE', slot: 6, damage: 60, rate: 1.4, clip: 1, spread: 0.004, range: 170, explosive: true, price: 15000, ammoPrice: 900, rank: 7 },
 ];
 export const weaponById = (id) => WEAPONS.find((w) => w.id === id);
 
 export function createWeapons(game) {
   const inv = {
-    owned: { fists: true, pistol: true }, ammo: { pistol: 90, smg: 0, shotgun: 0, rifle: 0 }, clip: { pistol: 15, smg: 0, shotgun: 0, rifle: 0 },
+    owned: { fists: true, pistol: true }, ammo: { pistol: 90, smg: 0, shotgun: 0, rifle: 0, launcher: 0 }, clip: { pistol: 15, smg: 0, shotgun: 0, rifle: 0, launcher: 0 },
     slot: 1, cooldown: 0, reload: 0,
   };
   const w = {
@@ -45,11 +46,12 @@ export function createWeapons(game) {
     },
     handlePlayerInput(p) {
       const input = game.input;
-      for (let k = 0; k < 5; k++) if (input.wasPressed('Digit' + (k + 1))) w.select(k);
+      for (let k = 0; k < WEAPONS.length; k++) if (input.wasPressed('Digit' + (k + 1))) w.select(k);
       const wheel = game.input.state.wheel;
       if (wheel && !p.hero.aiming) {
         let s = inv.slot;
-        for (let n = 0; n < 5; n++) { s = (s + Math.sign(wheel) + 5) % 5; if (inv.owned[WEAPONS[s].id]) break; }
+        const n = WEAPONS.length;
+        for (let k = 0; k < n; k++) { s = (s + Math.sign(wheel) + n) % n; if (inv.owned[WEAPONS[s].id]) break; }
         w.select(s);
         game.input.state.wheel = 0;
       }
@@ -74,7 +76,7 @@ export function createWeapons(game) {
     /** Shoot from a car at whatever the camera faces (pistol or SMG). */
     driveBy(p) {
       const def = w.current();
-      if (def.melee || def.id === 'rifle' || def.id === 'shotgun' || inv.cooldown > 0 || inv.reload > 0) return;
+      if (def.melee || def.id === 'rifle' || def.id === 'shotgun' || def.explosive || inv.cooldown > 0 || inv.reload > 0) return;
       if (inv.clip[def.id] <= 0) return w.reload(def);
       const ray = game.cameraRig.aimRay();
       const v = p.vehicle;
@@ -116,6 +118,7 @@ export function createWeapons(game) {
         const end = Math.min(best, range);
         const hx = origin.x + dx * end, hy = origin.y + dy * end, hz = origin.z + dz * end;
         game.fx.tracer(muzzle[0], muzzle[1], muzzle[2], hx, hy, hz, opts.byPlayer ? '#fff0b0' : '#ffb080');
+        if (def.explosive) { blast(hx, hy, hz, shooter, !!opts.byPlayer); continue; }
         if (best > range) continue;
         game.fx.impact(hx, hy, hz, kind);
         if (kind === 'flesh') {
@@ -133,6 +136,21 @@ export function createWeapons(game) {
       }
     },
   };
+
+  /** A rocket's blast: fireball, people and cars within 10 m take damage falling off with distance. */
+  function blast(x, y, z, shooter, byPlayer) {
+    game.fx.explosion(x, Math.max(0.5, y), z, 1.3);
+    game.audio?.explosion(x, z);
+    for (const h of game.humanoids()) {
+      const d = Math.hypot(h.x - x, h.z - z);
+      if (!h.alive || d > 10 || h === shooter) continue;
+      if (h.damage((10 - d) * 26, x, z)) game.events.emit('kill', { victim: h, byPlayer, x: h.x, z: h.z, shooter });
+    }
+    for (const v of game.vehicles.list) {
+      const d = Math.hypot(v.x - x, v.z - z);
+      if (d < 10) { game.vehicles.damage(v, (10 - d) * 16, byPlayer); if (v.condition <= 0) game.vehicles.explode(v); }
+    }
+  }
 
   function punch(hero) {
     hero.punchTime = 0.3;

@@ -4,7 +4,7 @@ import { summarize } from '../save/saveSystem.js';
 
 export const CONTROLS = [
   ['W A S D', 'Walk / drive'], ['Mouse', 'Look and aim (click to lock)'], ['Left click', 'Shoot / punch'], ['Right click or E', 'Aim down sights'],
-  ['Shift', 'Sprint / nitro'], ['Space', 'Jump / handbrake'], ['F', 'Steal, enter or exit a car'], ['1 - 5 or wheel', 'Weapon slots'],
+  ['Shift', 'Sprint / nitro'], ['Space', 'Jump / handbrake'], ['F', 'Steal, enter or exit a car'], ['1 - 6 or wheel', 'Weapon slots'], ['Z X C', 'Crew: Clean Break, Blackout, Eyes Up'],
   ['R', 'Reload'], ['H', 'Horn'], ['Q', 'Next radio station'], ['T', 'Taxi fares (in a cab)'], ['ENTER', 'Skip dialogue'], ['ESC', 'Pause menu, map and saves'],
 ];
 export const controlsHtml = () => CONTROLS.map(([k, v]) => `<div><kbd>${k}</kbd></div><div>${v}</div>`).join('');

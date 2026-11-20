@@ -57,7 +57,7 @@ export async function stageShot(game, name, title) {
   }
   if (name === 'shootout') {
     // Neon Row's north-south strip, where the club signs face the street: an over-the-shoulder
-    // view of Nico trading SMG fire with three Coyote collectors, traffic and a fleeing crowd.
+    // view of Santi trading SMG fire with three Coyote collectors, traffic and a fleeing crowd.
     progress(game, 2);
     game.sky.setHour(19.55);
     player.teleport(319, 40, 0);

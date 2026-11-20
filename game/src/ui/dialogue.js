@@ -1,11 +1,11 @@
-// The dialogue box: queued lines from the cast, each with its painted portrait and name, shown
+// The dialogue box: queued lines from the cast, each with its painted portrait, name and role, shown
 // for a time that fits its length; ENTER skips ahead. Resolves a promise when the queue empties.
 import { CAST, drawPortrait } from '../missions/storyCast.js';
 
 export function createDialogue(game) {
   const box = document.getElementById('dialogue');
   const portrait = document.getElementById('portrait').getContext('2d');
-  const nameEl = document.getElementById('dlg-name'), textEl = document.getElementById('dlg-text');
+  const nameEl = document.getElementById('dlg-name'), textEl = document.getElementById('dlg-text'), roleEl = document.getElementById('dlg-role');
   let queue = [], current = null, timer = 0, done = null;
 
   function next() {
@@ -18,7 +18,8 @@ export function createDialogue(game) {
     }
     box.classList.remove('hidden');
     drawPortrait(portrait, current.who, 120);
-    nameEl.textContent = (CAST[current.who]?.name || current.who).toUpperCase();
+    nameEl.textContent = CAST[current.who]?.name || current.who;
+    roleEl.textContent = CAST[current.who]?.tag || '';
     textEl.textContent = current.text;
     timer = current.time ?? Math.min(7, 2.2 + current.text.length * 0.045);
     game.audio?.blip();
